@@ -1,0 +1,113 @@
+import { Controller } from './Controller';
+import { ViewHelper } from './ViewHelper';
+
+import { refFetchingTimeout } from './configurations';
+
+export class Model {
+
+    refCache: { [refId: number]: HTMLElement } = {};
+    refsInFetching = new Set<number>();
+    refSubscriptions = new Map<number, Set<string>>();
+
+    get isSupported() {
+        if (!window.indexedDB || !window.fetch) {
+            return false;
+        }
+        return true;
+    }
+
+    async getRefCache(refId: number): Promise<HTMLElement> | null {
+        const elem = this.refCache[refId];
+        if (!elem) { return null; }
+        return elem.cloneNode(true) as HTMLElement;
+    }
+
+
+    async recordRef(refId: number, rawItem: HTMLElement, scope: 'page' | 'global' = 'page') {
+        this.refCache[refId] = rawItem.cloneNode(true) as HTMLElement;
+    }
+
+    async subscribeForLoadingItemElement(controller: Controller, refId: number, viewId: string, ignoresCache: boolean = false) {
+        if (!this.refSubscriptions.has(refId)) {
+            this.refSubscriptions.set(refId, new Set());
+        }
+        this.refSubscriptions.get(refId).add(viewId);
+
+        const itemCache = ignoresCache ? null : await this.getRefCache(refId);
+        if (itemCache) {
+            const item = this.processItemElement(itemCache, refId);
+            controller.updateViewContent(viewId, item);
+        } else if (!this.refsInFetching.has(refId)) {
+            this.refsInFetching.add(refId);
+
+            let item = await this.fetchItemElement(controller, refId, viewId);
+            item = this.processItemElement(item, refId);
+            this.refSubscriptions.get(refId).forEach((subscriptedViewId) => {
+                controller.updateViewContent(subscriptedViewId, item.cloneNode(true) as HTMLElement);
+            });
+            this.refsInFetching.delete(refId);
+        }
+    }
+
+    async fetchItemElement(controller: Controller, refId: number, viewId: string) {
+        const itemContainer = document.createElement('div');
+        const abortController = new AbortController();
+        try {
+            const resp = await Promise.race([
+                fetch(`/Home/Forum/ref?id=${refId}`, { signal: abortController.signal }),
+                new Promise((_, reject) => {
+                    let spentMs = 0;
+                    const intervalId = setInterval(() => {
+                        spentMs += 20;
+                        if (!controller.isLoading(viewId)) {
+                            clearInterval(intervalId);
+                        } else if (refFetchingTimeout && spentMs >= refFetchingTimeout) {
+                            reject(new Error('Timeout'));
+                            abortController.abort();
+                            clearInterval(intervalId);
+                        } else {
+                            this.refSubscriptions.get(refId).forEach((viewIdToReport) => {
+                                controller.reportSpentTime(viewIdToReport, spentMs);
+                            });
+                        }
+                    }, 20);
+                }),
+            ]) as Response;
+            itemContainer.innerHTML = await resp.text();
+        } catch (e) {
+            let message;
+            if (e instanceof Error) {
+                if (e.message === 'Timeout') {
+                    message = `获取引用内容超时！`;
+                } else {
+                    message = `获取引用内容失败：${e.toString()}`;
+                }
+            } else {
+                message = `获取引用内容失败：${String(e)}`;
+            }
+            const errorSpan = document.createElement('span');
+            errorSpan.classList.add('fto-ref-view-error');
+            errorSpan.textContent = message;
+            return errorSpan;
+        }
+
+        const item = itemContainer.firstElementChild as HTMLElement;
+        this.recordRef(refId, item, 'global');
+        return item;
+    }
+
+    processItemElement(item: HTMLElement, refId: number) {
+        if (item.querySelector('.fto-ref-view-error')) {
+            return item;
+        }
+        if (!ViewHelper.getThreadID(item)) {
+            const errorSpan = document.createElement('span');
+            errorSpan.classList.add('fto-ref-view-error');
+            errorSpan.textContent = `引用内容不存在！`;
+            this.recordRef(refId, item, 'page');
+            return errorSpan;
+        }
+        return item;
+    }
+
+}

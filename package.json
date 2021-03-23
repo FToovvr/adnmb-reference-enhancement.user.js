@@ -1,0 +1,20 @@
+{
+  "name": "adnmb-reference-enhancement",
+  "version": "0.2.0",
+  "description": "让A岛网页端的引用支持嵌套查看、固定、折叠等功能",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "author": "FToovvr",
+  "license": "MIT; https://opensource.org/licenses/MIT",
+  "devDependencies": {
+    "rollup": "^2.42.3",
+    "rollup-plugin-import-css": "^2.0.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-userscript-metablock": "^0.2.7",
+    "tslib": "^2.1.0",
+    "typescript": "^4.2.3"
+  }
+}
