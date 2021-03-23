@@ -50,50 +50,44 @@ export class Model {
     }
 
     async fetchItemElement(controller: Controller, refId: number, viewId: string) {
-        const itemContainer = document.createElement('div');
-        const abortController = new AbortController();
-        try {
-            const resp = await Promise.race([
-                fetch(`/Home/Forum/ref?id=${refId}`, { signal: abortController.signal }),
-                new Promise((_, reject) => {
-                    let spentMs = 0;
-                    const intervalId = setInterval(() => {
-                        spentMs += 20;
-                        if (!controller.isLoading(viewId)) {
-                            clearInterval(intervalId);
-                        } else if (configurations.refFetchingTimeout && spentMs >= configurations.refFetchingTimeout) {
-                            reject(new Error('Timeout'));
-                            abortController.abort();
-                            clearInterval(intervalId);
-                        } else {
-                            this.refSubscriptions.get(refId).forEach((viewIdToReport) => {
-                                controller.reportSpentTime(viewIdToReport, spentMs);
-                            });
-                        }
-                    }, 20);
-                }),
-            ]) as Response;
-            itemContainer.innerHTML = await resp.text();
-        } catch (e) {
-            let message;
-            if (e instanceof Error) {
-                if (e.message === 'Timeout') {
-                    message = `获取引用内容超时！`;
-                } else {
-                    message = `获取引用内容失败：${e.toString()}`;
-                }
+        let spentMs = 0;
+        const intervalId = setInterval(() => {
+            spentMs += 20;
+            if (!controller.isLoading(viewId)) {
+                clearInterval(intervalId);
             } else {
-                message = `获取引用内容失败：${String(e)}`;
+                this.refSubscriptions.get(refId).forEach((viewIdToReport) => {
+                    controller.reportSpentTime(viewIdToReport, spentMs);
+                });
             }
-            const errorSpan = document.createElement('span');
-            errorSpan.classList.add('fto-ref-view-error');
-            errorSpan.textContent = message;
-            return errorSpan;
-        }
+        }, 20);
 
-        const item = itemContainer.firstElementChild as HTMLElement;
-        this.recordRef(refId, item, 'global');
-        return item;
+        return new Promise<HTMLElement>((resolve, _) => {
+            const itemContainer = document.createElement('div');
+            $.ajax({
+                url: `/Home/Forum/ref?id=${refId}`,
+                dataType: "html",
+                timeout: configurations.refFetchingTimeout,
+                success: data => {
+                    itemContainer.innerHTML = data;
+                    const item = itemContainer.firstElementChild as HTMLElement;
+                    this.recordRef(refId, item, 'global');
+                    resolve(item);
+                },
+                error: (_, status, error) => {
+                    let message: string;
+                    if (status === 'timeout') {
+                        message = `获取引用内容超时！`;
+                    } else {
+                        message = `获取引用内容失败：${error}`;
+                    }
+                    const errorSpan = document.createElement('span');
+                    errorSpan.classList.add('fto-ref-view-error');
+                    errorSpan.textContent = message;
+                    resolve(errorSpan);
+                }
+            });
+        });
     }
 
     processItemElement(item: HTMLElement, refId: number) {
