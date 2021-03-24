@@ -13,6 +13,14 @@
     margin: 0px;
 }
 
+%fto-ref-view-fixed {
+    display: block;
+
+    + br {
+        display: none;
+    }
+}
+
 .fto-ref-view {
     // 照搬自 h.desktop.css '#h-ref-view .h-threads-item-ref'
     background: #f0e0d6;
@@ -40,14 +48,6 @@
     &[data-status="floating"] {
         position: absolute;
         z-index: 999;
-    }
-
-    %fto-ref-view-fixed {
-        display: block;
-
-        + br {
-            display: none;
-        }
     }
 
     &[data-status="open"] {

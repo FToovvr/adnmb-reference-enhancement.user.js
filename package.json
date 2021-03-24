@@ -1,6 +1,6 @@
 {
   "name": "adnmb-reference-enhancement",
-  "version": "0.3.0-alpha.2",
+  "version": "0.3.0-alpha.3",
   "description": "让A岛网页端的引用支持嵌套查看、固定、折叠等功能",
   "main": "src/main.js",
   "scripts": {
