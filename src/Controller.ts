@@ -115,12 +115,6 @@ export class Controller {
             const itemElem = originalItemElem.cloneNode(true) as HTMLElement;
             itemElem.classList.add('h-threads-item-ref');
             itemElem.querySelector('.h-threads-item-reply-icon').remove();
-            for (const child of itemElem.querySelector('.h-threads-item-reply-main').children) {
-                if (!child.classList.contains('h-threads-info')
-                    && !child.classList.contains('h-threads-content')) {
-                    child.remove();
-                }
-            }
             itemElem.querySelectorAll('.uk-text-primary').forEach((labelElem) => {
                 if (labelElem.textContent === "(PO主)") {
                     labelElem.remove();
