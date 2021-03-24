@@ -9,7 +9,7 @@ import {
     autoOpenRefViewIfRefContentAlreadyCached
 } from './configurations';
 
-import additionalStyleText from './style.css';
+import additionalStyleText from './style.scss';
 
 const additioanVariableStyleText = `
     .fto-ref-view[data-status="floating"] {
@@ -19,6 +19,10 @@ const additioanVariableStyleText = `
 
     .fto-ref-view[data-status="collapsed"] {
         max-height: ${collapsedHeight}px;
+    }
+
+    .fto-ref-view[data-status="closed"] {
+        /* transition: opacity ${fadingDuration} ease-out; */
     }
     `;
 

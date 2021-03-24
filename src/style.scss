@@ -1,0 +1,119 @@
+.h-threads-content {
+    word-break: break-word;
+}
+
+.h-threads-item-ref .h-threads-content {
+    margin: 5px 20px;
+}
+
+// 修复 h.desktop.css 里 '.h-threads-item .h-threads-content' 这条选择器导致的问题
+.h-threads-info {
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0px;
+}
+
+.fto-ref-view {
+    // 照搬自 h.desktop.css '#h-ref-view .h-threads-item-ref'
+    background: #f0e0d6;
+    border: 1px solid #000;
+
+    clear: left;
+    position: relative;
+    width: max-content;
+    max-width: calc(100vw - var(--offset-left) - 35px);
+    margin-left: -5px;
+    margin-right: -40px;
+
+    &[data-status="closed"] {
+        //display: none;
+        opacity: 0;
+        display: inline-block;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
+
+    &[data-status="floating"] {
+        position: absolute;
+        z-index: 999;
+    }
+
+    %fto-ref-view-fixed {
+        display: block;
+
+        + br {
+            display: none;
+        }
+    }
+
+    &[data-status="open"] {
+        @extend %fto-ref-view-fixed;
+    }
+
+    &[data-status="collapsed"] {
+        @extend %fto-ref-view-fixed;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        // https://stackoverflow.com/a/22809380
+        &:before {
+            content: "";
+            position: absolute;
+            top: 60px;
+            height: 20px;
+            width: 100%;
+            background: linear-gradient(#f0e0d600, #ffeeddcc);
+            z-index: 999;
+        }
+    }
+
+    .fto-ref-view-error {
+        color: red;
+    }
+
+    .fto-ref-view-button {
+        position: relative;
+        font-size: smaller;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .fto-ref-view-pin {
+        display: inline-block;
+        transform: rotate(-45deg);
+    }
+
+    @each $status in "floating", "collapsed" {
+        &[data-status="#{$status}"] > {
+            .h-threads-item > .h-threads-item-ref > .h-threads-item-reply-main > .h-threads-info,
+            .fto-ref-view-error,
+            .fto-ref-view-loading {
+                & > .fto-ref-view-button-list > .fto-ref-view-pin {
+                    @if $status == "floating" {
+                        // https://codemyui.com/grayscale-emoji-using-css/
+                        transform: none;
+                        filter: grayscale(100%);
+                    } @else if $status == "collapsed" {
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            height: 110%;
+                            width: 100%;
+                            background: linear-gradient(#f0e0d600, #f0e0d6ff);
+                            z-index: 999;
+                            transform: rotate(45deg);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
