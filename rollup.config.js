@@ -16,7 +16,7 @@ export default {
     input: 'src/main.ts',
     plugins: [
         license({ banner: { commentStyle: 'ignored', content: { file: path.join(__dirname, 'LICENSE') } } }),
-        typescript({ lib: ["es6", "dom"], target: "es6" }),
+        typescript({ lib: ["es2020", "dom"], target: "es6" }),
         scss({
             output: false,
             processor: css => postcss([

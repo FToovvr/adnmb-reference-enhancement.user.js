@@ -6,21 +6,6 @@ import configurations from './configurations';
 
 import additionalStyleText from './style.scss';
 
-const additioanVariableStyleText = `
-    .fto-ref-view[data-status="floating"] {
-        opacity: ${configurations.floatingOpacity};
-        transition: opacity ${configurations.fadingDuration} ease-in;
-    }
-
-    .fto-ref-view[data-status="collapsed"] {
-        max-height: ${configurations.collapsedHeight}px;
-    }
-
-    .fto-ref-view[data-status="closed"] {
-        /* transition: opacity ${configurations.fadingDuration} ease-out; */
-    }
-    `;
-
 export class Controller {
 
     model: Model;
@@ -29,10 +14,27 @@ export class Controller {
         this.model = model;
     }
 
+    static makeAdditionalVariableStyleText() {
+        return `
+        .fto-ref-view[data-status="floating"] {
+            opacity: ${configurations.floatingOpacity}%;
+            transition: opacity ${configurations.fadingDuration}ms ease-in;
+        }
+
+        .fto-ref-view[data-status="collapsed"] {
+            max-height: ${configurations.collapsedHeight}px;
+        }
+
+        .fto-ref-view[data-status="closed"] {
+            /* transition: opacity ${configurations.fadingDuration}ms ease-out; */
+        }
+        `;
+    }
+
     static setupStyle() {
         for (const [styleText, id] of [
             [additionalStyleText, 'fto-style-additional-fixed'],
-            [additioanVariableStyleText, 'fto-style-additional-variable'],
+            [this.makeAdditionalVariableStyleText(), 'fto-style-additional-variable'],
         ]) {
             const style = document.createElement('style');
             style.id = id;
@@ -41,6 +43,12 @@ export class Controller {
             style.append(styleText);
             document.head.append(style);
         }
+
+        configurations.onConfigurationChange(() => {
+            const style = document.querySelector('#fto-style-additional-variable');
+            style.innerHTML = '';
+            style.append(this.makeAdditionalVariableStyleText());
+        });
     }
 
     setupContent(root: HTMLElement) {

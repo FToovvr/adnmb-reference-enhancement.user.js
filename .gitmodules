@@ -1,0 +1,3 @@
+[submodule "lib-types/GM_config"]
+	path = types/GM_config
+	url = https://github.com/sizzlemctwizzle/GM_config

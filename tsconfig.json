@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "es2020",
+            "dom"
+        ],
+        "target": "es6",
+        "outFile": "dist/out.js"
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

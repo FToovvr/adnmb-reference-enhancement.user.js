@@ -2,5 +2,8 @@
     "name": "A岛引用查看增强",
     "namespace": "http://tampermonkey.net/",
     "include": "/^https?://(adnmb\\d*.com|tnmb.org)/.*$/",
-    "homepageURL": "https://github.com/FToovvr/adnmb-reference-enhancement.user.js"
+    "homepageURL": "https://github.com/FToovvr/adnmb-reference-enhancement.user.js",
+    "require": [
+        "https://openuserjs.org/src/libs/sizzle/GM_config.js"
+    ]
 }
