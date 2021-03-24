@@ -91,6 +91,10 @@
         transform: rotate(-45deg);
     }
 
+    &[data-is-loading] .fto-ref-view-refresh {
+        display: none;
+    }
+
     @each $status in "floating", "collapsed" {
         &[data-status="#{$status}"] > {
             .h-threads-item > .h-threads-item-ref > .h-threads-item-reply-main > .h-threads-info,

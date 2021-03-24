@@ -15,7 +15,7 @@ export class Controller {
     }
 
     static makeAdditionalVariableStyleText() {
-        return `
+        let styleText = `
         .fto-ref-view[data-status="floating"] {
             opacity: ${configurations.floatingOpacity}%;
             transition: opacity ${configurations.fadingDuration}ms ease-in;
@@ -29,6 +29,19 @@ export class Controller {
             /* transition: opacity ${configurations.fadingDuration}ms ease-out; */
         }
         `;
+
+        if (!configurations.showRefreshButtonEvenIfRefContentLoaded) {
+            styleText += `
+            .fto-ref-view-refresh {
+                display: none;
+            }
+            .fto-ref-view-error .fto-ref-view-refresh {
+                display: inline;
+            }
+            `;
+        }
+
+        return styleText;
     }
 
     static setupStyle() {
@@ -184,18 +197,15 @@ export class Controller {
         });
         buttonListSpan.append(pinSpan);
 
-        if (!viewDiv.dataset.isLoading &&
-            (!ViewHelper.hasFetchingRefSucceeded(elem) || configurations.showRefreshButtonEvenIfRefContentLoaded)) {
-            // 刷新🔄按钮
-            const refreshSpan = document.createElement('span');
-            refreshSpan.classList.add('fto-ref-view-refresh', 'fto-ref-view-button');
-            refreshSpan.textContent = "🔄";
-            refreshSpan.addEventListener('click', () => {
-                this.startLoadingViewContent(viewDiv, Number(linkElem.dataset.refId), true);
-            });
-            Utils.insertAfter(pinSpan, refreshSpan);
-            buttonListSpan.append(refreshSpan);
-        }
+        // 刷新🔄按钮
+        const refreshSpan = document.createElement('span');
+        refreshSpan.classList.add('fto-ref-view-refresh', 'fto-ref-view-button');
+        refreshSpan.textContent = "🔄";
+        refreshSpan.addEventListener('click', () => {
+            this.startLoadingViewContent(viewDiv, Number(linkElem.dataset.refId), true);
+        });
+        Utils.insertAfter(pinSpan, refreshSpan);
+        buttonListSpan.append(refreshSpan);
 
         elem.prepend(buttonListSpan);
     }
