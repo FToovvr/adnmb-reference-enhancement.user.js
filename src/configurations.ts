@@ -1,5 +1,7 @@
 /// <reference path="../types/GM_config/gm_config.js" />
 
+import configWindowStyle from './configWindow.scss';
+
 class Configurations {
 
     gmc: GM_configStruct;
@@ -14,6 +16,7 @@ class Configurations {
         if (!Configurations.canConfigurate) { return; }
         this.gmc = new GM_configStruct({
             id: "adnmb-reference-enhancement",
+            title: "「A岛引用查看增强」 用户脚本 设置",
             fields: {
                 collapsedHeight: {
                     section: "引用视图",
@@ -78,12 +81,22 @@ class Configurations {
                 }
             },
             events: {
+                open: () => {
+                    const frame = (this.gmc as any).frame as HTMLIFrameElement;
+                    frame.setAttribute('style', `
+                        position: fixed; z-index: 9999;
+                        left: 50%; top: 50%; transform: translate(-50%, -50%);
+                        width: fit-content; height: 500px; max-height: 80%;
+                        border: 1px solid black;
+                    `);
+                },
                 save: () => {
                     for (const fn of this.onConfigurationChangeCallbacks) {
                         fn();
                     }
-                }
-            }
+                },
+            },
+            css: configWindowStyle,
         });
 
         window.debugOpenConfigurationWindow = () => this.openConfigurationWindow();
