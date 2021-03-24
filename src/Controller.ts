@@ -188,11 +188,9 @@ export class Controller {
         pinSpan.textContent = "📌";
         pinSpan.addEventListener('click', () => {
             if (viewDiv.dataset.status === 'floating') {
-                linkElem.dataset.status = 'open';
-                viewDiv.dataset.status = 'open';
+                this.changeViewStatus(viewDiv, 'open');
             } else {
-                linkElem.dataset.status = 'closed';
-                viewDiv.dataset.status = configurations.clickPinToCloseView ? 'closed' : 'floating';
+                this.changeViewStatus(viewDiv, configurations.clickPinToCloseView ? 'closed' : 'floating');
             }
         });
         buttonListSpan.append(pinSpan);
@@ -226,8 +224,8 @@ export class Controller {
         const viewDiv = document.createElement('div');
         viewDiv.classList.add('fto-ref-view');
         // closed: 不显示; floating: 悬浮显示; open: 完整固定显示; collapsed: 折叠固定显示
-        viewDiv.dataset.status = 'closed';
         viewDiv.dataset.viewId = viewId;
+        this.changeViewStatus(viewDiv, 'closed');
 
         viewDiv.style.setProperty('--offset-left', `${Utils.getCoords(linkElem).left}px`);
 
@@ -237,8 +235,7 @@ export class Controller {
             (async () => {
                 const refCache = await this.model.getRefCache(refId);
                 if (refCache) {
-                    linkElem.dataset.status = 'open';
-                    viewDiv.dataset.status = 'collapsed';
+                    this.changeViewStatus(viewDiv, 'collapsed');
                     viewDiv.append(refCache);
                     this.setupContent(refCache);
                 }
@@ -251,7 +248,7 @@ export class Controller {
                 viewDiv.dataset.isHovering = '1';
                 return;
             }
-            viewDiv.dataset.status = 'floating';
+            this.changeViewStatus(viewDiv, 'floating');
             viewDiv.dataset.isHovering = '1';
             this.startLoadingViewContent(viewDiv, refId);
         });
@@ -267,7 +264,7 @@ export class Controller {
                 (async () => {
                     setTimeout(() => {
                         if (!viewDiv.dataset.isHovering) {
-                            viewDiv.dataset.status = 'closed';
+                            this.changeViewStatus(viewDiv, 'closed');
                         }
                     }, 200);
                 })();
@@ -276,17 +273,15 @@ export class Controller {
 
         // 处理折叠
         linkElem.addEventListener('click', () => {
-            if (linkElem.dataset.status === 'closed'
-                || ['collapsed', 'floating'].includes(viewDiv.dataset.status)) {
-                linkElem.dataset.status = 'open';
-                viewDiv.dataset.status = 'open';
-            } else if (viewDiv.clientHeight > configurations.collapsedHeight) {
-                viewDiv.dataset.status = 'collapsed';
+            if (viewDiv.dataset.status === 'open') {
+                this.changeViewStatus(viewDiv, 'collapsed');
+            } else {
+                this.changeViewStatus(viewDiv, 'open');
             }
         });
         viewDiv.addEventListener('click', () => {
             if (viewDiv.dataset.status === 'collapsed') {
-                viewDiv.dataset.status = 'open';
+                this.changeViewStatus(viewDiv, 'open');
             }
         });
     }
@@ -336,6 +331,32 @@ export class Controller {
         viewDiv.innerHTML = '';
         viewDiv.append(itemElement);
         this.setupContent(itemElement);
+    }
+
+    changeViewStatus(viewDiv: HTMLElement, status: 'closed' | 'floating' | 'open' | 'collapsed') {
+
+        switch (status) {
+            case 'closed': case 'floating': case 'open':
+                viewDiv.dataset.status = status;
+                break;
+            case 'collapsed':
+                if (viewDiv.clientHeight > configurations.collapsedHeight) {
+                    viewDiv.dataset.status = 'collapsed';
+                } else {
+                    viewDiv.dataset.status = 'open';
+                }
+                break;
+        }
+
+        const linkElem = ViewHelper.getRefLinkByViewId(viewDiv.dataset.viewId);
+        switch (viewDiv.dataset.status) {
+            case 'closed': case 'floating':
+                linkElem.dataset.status = 'closed';
+                break;
+            case 'open': case 'collapsed':
+                linkElem.dataset.status = 'open';
+        }
+
     }
 
 }
