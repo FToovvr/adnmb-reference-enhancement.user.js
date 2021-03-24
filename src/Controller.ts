@@ -64,7 +64,7 @@ export class Controller {
         });
     }
 
-    setupContent(root: HTMLElement) {
+    setupContent(root: HTMLElement, parentAutoOpenPromiseResolve: (() => void) | null = null) {
 
         if (root === document.body) {
             root.querySelectorAll('.h-threads-item').forEach((threadItemElem) => {
@@ -86,10 +86,24 @@ export class Controller {
             return;
         }
 
-        root.querySelectorAll('font[color="#789922"]').forEach(linkElem => {
+        const linkElems = root.querySelectorAll('font[color="#789922"]');
+        if (linkElems.length === 0) {
+            parentAutoOpenPromiseResolve?.();
+            return;
+        }
+        let unfinished = linkElems.length;
+        linkElems.forEach(linkElem => {
             if (!linkElem.textContent.startsWith('>>')) { return; }
-            this.setupRefLink(linkElem as HTMLElement);
+            (async () => { // 此时不 async 更待何时 (ゝ∀･)？
+                this.setupRefLink(linkElem as HTMLElement, () => {
+                    unfinished--;
+                    if (unfinished === 0) {
+                        parentAutoOpenPromiseResolve?.();
+                    }
+                });
+            })();
         });
+
     }
 
     setupThreadContent(threadItemElem: HTMLElement) {
@@ -208,7 +222,7 @@ export class Controller {
         elem.prepend(buttonListSpan);
     }
 
-    setupRefLink(linkElem: HTMLElement) {
+    setupRefLink(linkElem: HTMLElement, parentAutoOpenPromiseResolve: (() => void) | null) {
         linkElem.classList.add('fto-ref-link');
         // closed: 无固定显示 view; open: 有固定显示 view
         linkElem.dataset.status = 'closed';
@@ -233,13 +247,21 @@ export class Controller {
 
         if (configurations.autoOpenRefViewIfRefContentAlreadyCached) {
             (async () => {
-                const refCache = await this.model.getRefCache(refId);
-                if (refCache) {
-                    this.changeViewStatus(viewDiv, 'collapsed');
-                    viewDiv.append(refCache);
-                    this.setupContent(refCache);
-                }
+                await new Promise<void>(async (resolve) => {
+                    const refCache = await this.model.getRefCache(refId);
+                    if (refCache) {
+                        this.changeViewStatus(viewDiv, 'open');
+                        viewDiv.append(refCache);
+                        this.setupContent(refCache, resolve);
+                    } else {
+                        resolve();
+                    }
+                });
+                this.changeViewStatus(viewDiv, 'collapsed');
+                parentAutoOpenPromiseResolve?.();
             })();
+        } else {
+            parentAutoOpenPromiseResolve?.();
         }
 
         // 处理悬浮
