@@ -1,7 +1,7 @@
 import { Controller } from './Controller';
 import { ViewHelper } from './ViewHelper';
 
-import { refFetchingTimeout } from './configurations';
+import configurations from './configurations';
 
 export class Model {
 
@@ -10,7 +10,7 @@ export class Model {
     refSubscriptions = new Map<number, Set<string>>();
 
     get isSupported() {
-        if (!window.indexedDB || !window.fetch) {
+        if (!window.indexedDB) {
             return false;
         }
         return true;
@@ -61,7 +61,7 @@ export class Model {
                         spentMs += 20;
                         if (!controller.isLoading(viewId)) {
                             clearInterval(intervalId);
-                        } else if (refFetchingTimeout && spentMs >= refFetchingTimeout) {
+                        } else if (configurations.refFetchingTimeout && spentMs >= configurations.refFetchingTimeout) {
                             reject(new Error('Timeout'));
                             abortController.abort();
                             clearInterval(intervalId);

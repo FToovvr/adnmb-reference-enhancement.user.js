@@ -2,27 +2,22 @@ import { Model } from './Model';
 import { ViewHelper } from './ViewHelper';
 import { Utils } from './Utils';
 
-import {
-    floatingOpacity, fadingDuration, collapsedHeight,
-    clickPinToCloseView,
-    showRefreshButtonEvenIfRefContentLoaded,
-    autoOpenRefViewIfRefContentAlreadyCached
-} from './configurations';
+import configurations from './configurations';
 
 import additionalStyleText from './style.scss';
 
 const additioanVariableStyleText = `
     .fto-ref-view[data-status="floating"] {
-        opacity: ${floatingOpacity};
-        transition: opacity ${fadingDuration} ease-in;
+        opacity: ${configurations.floatingOpacity};
+        transition: opacity ${configurations.fadingDuration} ease-in;
     }
 
     .fto-ref-view[data-status="collapsed"] {
-        max-height: ${collapsedHeight}px;
+        max-height: ${configurations.collapsedHeight}px;
     }
 
     .fto-ref-view[data-status="closed"] {
-        /* transition: opacity ${fadingDuration} ease-out; */
+        /* transition: opacity ${configurations.fadingDuration} ease-out; */
     }
     `;
 
@@ -182,13 +177,13 @@ export class Controller {
                 viewDiv.dataset.status = 'open';
             } else {
                 linkElem.dataset.status = 'closed';
-                viewDiv.dataset.status = clickPinToCloseView ? 'closed' : 'floating';
+                viewDiv.dataset.status = configurations.clickPinToCloseView ? 'closed' : 'floating';
             }
         });
         buttonListSpan.append(pinSpan);
 
         if (!viewDiv.dataset.isLoading &&
-            (!ViewHelper.hasFetchingRefSucceeded(elem) || showRefreshButtonEvenIfRefContentLoaded)) {
+            (!ViewHelper.hasFetchingRefSucceeded(elem) || configurations.showRefreshButtonEvenIfRefContentLoaded)) {
             // 刷新🔄按钮
             const refreshSpan = document.createElement('span');
             refreshSpan.classList.add('fto-ref-view-refresh', 'fto-ref-view-button');
@@ -226,7 +221,7 @@ export class Controller {
 
         Utils.insertAfter(linkElem, viewDiv);
 
-        if (autoOpenRefViewIfRefContentAlreadyCached) {
+        if (configurations.autoOpenRefViewIfRefContentAlreadyCached) {
             (async () => {
                 const refCache = await this.model.getRefCache(refId);
                 if (refCache) {
@@ -273,7 +268,7 @@ export class Controller {
                 || ['collapsed', 'floating'].includes(viewDiv.dataset.status)) {
                 linkElem.dataset.status = 'open';
                 viewDiv.dataset.status = 'open';
-            } else if (viewDiv.clientHeight > collapsedHeight) {
+            } else if (viewDiv.clientHeight > configurations.collapsedHeight) {
                 viewDiv.dataset.status = 'collapsed';
             }
         });
