@@ -237,15 +237,17 @@ export class Controller {
 
         const viewDiv = document.createElement('div');
         viewDiv.classList.add('fto-ref-view');
-        // closed: 不显示; floating: 悬浮显示; open: 完整固定显示; collapsed: 折叠固定显示
+        viewDiv.dataset.refId = String(refId);
         viewDiv.dataset.viewId = viewId;
+        // closed: 不显示; floating: 悬浮显示; open: 完整固定显示; collapsed: 折叠固定显示
         this.changeViewStatus(viewDiv, 'closed');
 
         viewDiv.style.setProperty('--offset-left', `${Utils.getCoords(linkElem).left}px`);
 
         Utils.insertAfter(linkElem, viewDiv);
 
-        if (configurations.autoOpenRefViewIfRefContentAlreadyCached) {
+        if (configurations.autoOpenRefViewIfRefContentAlreadyCached
+            && !this.isInsideReference(viewDiv, refId)) {
             (async () => {
                 await new Promise<void>(async (resolve) => {
                     const refCache = await this.model.getRefCache(refId);
@@ -379,6 +381,13 @@ export class Controller {
                 linkElem.dataset.status = 'open';
         }
 
+    }
+
+    isInsideReference(viewDiv: HTMLElement, refId: number) {
+        for (const _ of ViewHelper.getAncestorRefViews(viewDiv, refId)) {
+            return true;
+        }
+        return false;
     }
 
 }

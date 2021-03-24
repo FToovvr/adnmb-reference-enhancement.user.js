@@ -38,4 +38,14 @@ export class ViewHelper {
         return document.querySelector(`.fto-ref-link[data-view-id="${viewId}"]`) as HTMLElement;
     }
 
+    static *getAncestorRefViews(currentView: HTMLElement, refId: number | null = null) {
+        if (!currentView.classList.contains('fto-ref-view')) {
+            currentView = currentView.closest('.fto-ref-view');
+        }
+        const next = (v: HTMLElement) => v.parentElement.closest('.fto-ref-view' + (refId ? `[data-ref-id="${refId}"]` : ''));
+        for (let ancestorView = next(currentView); ancestorView; ancestorView = next(currentView)) {
+            yield ancestorView;
+        }
+    }
+
 }

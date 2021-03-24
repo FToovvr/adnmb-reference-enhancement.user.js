@@ -8,3 +8,4 @@
 * 同一份不存在的内容两次：https://adnmb3.com/t/36081863
 * 超级嵌套: https://adnmb3.com/t/20311039?page=1641
 * 各种内容: https://adnmb3.com/t/26165309?page=3（页数是随便选的）
+* 递归引用: https://adnmb3.com/t/33331211?page=25 >>No.33333333
