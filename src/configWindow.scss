@@ -1,3 +1,28 @@
 body {
     width: fit-content;
 }
+
+.config_var {
+    display: flex;
+    justify-content: space-between;
+
+    > label {
+        min-width: fit-content;
+    }
+    > input[type="text"] {
+        flex-grow: 1;
+        text-align: right;
+    }
+
+    :nth-child(2) {
+        text-align: right;
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            ~ :before {
+                content: "\A";
+                white-space: pre;
+            }
+        }
+    }
+}
