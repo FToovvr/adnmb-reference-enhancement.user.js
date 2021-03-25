@@ -58,14 +58,46 @@ class Configurations {
                     default: "悬浮引用视图",
                 },
 
+                autoOpenTarget: {
+                    section: [null, "自动打开"],
+                    label: "自动打开的对象",
+                    labelPos: 'left',
+                    type: 'radio',
+                    title: "",
+                    options: ["无", "内容已缓存的引用视图"],
+                    default: "无",
+                },
+                autoOpenStatus: {
+                    label: "自动打开后引用视图的状态",
+                    labelPos: 'left',
+                    type: 'radio',
+                    title: "",
+                    options: ["完整展开", "折叠"],
+                    default: "折叠",
+                },
+                autoOpenDepthLimit: {
+                    label: "自动打开层数限制（「0」为不限）",
+                    labelPos: 'left',
+                    type: 'int',
+                    title: "",
+                    default: 1,
+                },
+                autoOpenScope: {
+                    label: "自动打开的作用范围",
+                    labelPos: 'left',
+                    type: 'radio',
+                    title: "",
+                    options: ["只在初次加载页面和引用视图时尝试自动打开", "在缓存了新的引用内容后自动打开其他相同内容的引用视图"],
+                    default: "只在初次加载页面和引用视图时尝试自动打开",
+                },
+
 
                 refFetchingTimeout: {
                     section: "引用内容加载",
-                    label: "超时时限（毫秒）",
+                    label: "超时时限（毫秒）（「0」为不限）",
                     labelPos: 'left',
                     type: 'float',
-                    title: "获取引用内容多久算超时。"
-                        + "如为「0」则代表无超时时限。",
+                    title: "获取引用内容多久算超时。",
                     default: 10000,
                 },
                 showRefreshButtonEvenIfRefContentLoaded: {

@@ -2,6 +2,14 @@ body {
     width: fit-content;
 }
 
+.config_header {
+    &::after {
+        content: "\A（本页面可滚动）";
+        white-space: pre;
+        font-size: small;
+    }
+}
+
 .config_var {
     display: flex;
     justify-content: space-between;
@@ -12,6 +20,7 @@ body {
     > input[type="text"] {
         flex-grow: 1;
         text-align: right;
+        max-width: 60px;
     }
 
     :nth-child(2) {
@@ -19,7 +28,7 @@ body {
 
         input[type="radio"],
         input[type="checkbox"] {
-            ~ :before {
+            ~ ::before {
                 content: "\A";
                 white-space: pre;
             }

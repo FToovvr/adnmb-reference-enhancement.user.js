@@ -61,7 +61,7 @@
         text-overflow: ellipsis;
 
         // https://stackoverflow.com/a/22809380
-        &:before {
+        &::before {
             content: "";
             position: absolute;
             top: 60px;
@@ -106,7 +106,7 @@
                         transform: none;
                         filter: grayscale(100%);
                     } @else if $status == "collapsed" {
-                        &:before {
+                        &::before {
                             content: "";
                             position: absolute;
                             height: 110%;
