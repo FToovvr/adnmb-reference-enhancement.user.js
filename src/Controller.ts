@@ -269,10 +269,11 @@ export class Controller {
             if (viewDiv.dataset.status !== 'closed') {
                 viewDiv.dataset.isHovering = '1';
                 return;
+            } else if (configurations.hoverRefLinkToFloatRefView) {
+                this.changeViewStatus(viewDiv, 'floating');
+                viewDiv.dataset.isHovering = '1';
+                this.startLoadingViewContent(viewDiv, refId);
             }
-            this.changeViewStatus(viewDiv, 'floating');
-            viewDiv.dataset.isHovering = '1';
-            this.startLoadingViewContent(viewDiv, refId);
         });
         viewDiv.addEventListener('mouseenter', () => {
             viewDiv.dataset.isHovering = '1';
@@ -299,6 +300,7 @@ export class Controller {
                 this.changeViewStatus(viewDiv, 'collapsed');
             } else {
                 this.changeViewStatus(viewDiv, 'open');
+                this.startLoadingViewContent(viewDiv, refId);
             }
         });
         viewDiv.addEventListener('click', () => {

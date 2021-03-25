@@ -20,7 +20,7 @@ class Configurations {
             fields: {
                 collapsedHeight: {
                     section: ["引用视图", "外观表现"],
-                    label: "折叠高度（px）",
+                    label: "折叠时高度（px）",
                     labelPos: 'left',
                     type: 'float',
                     title: "引用视图被折叠后保持的高度。"
@@ -41,13 +41,24 @@ class Configurations {
                     title: "为什么只有淡入？因为淡出的代码不能一步到位，摸了 (ゝ∀･)",
                     default: 0,
                 },
-                clickPinToCloseView: {
-                    label: "固定状态下点击「📌」直接关闭引用视图",
+
+                onHoverOnRefLink: {
+                    section: [null, "行为"],
+                    label: "当鼠标位于引用链接上时",
                     labelPos: 'left',
-                    type: 'checkbox',
-                    title: "如不选定，固定状态下点击「📌」会使引用视图变为悬浮状态。",
-                    default: false,
+                    type: 'radio',
+                    options: ["无行为", "悬浮展现引用内容"],
+                    default: "悬浮展现引用内容",
                 },
+                onClickPinOnOpenRefView: {
+                    label: "在引用视图固定时点击「📌」",
+                    labelPos: 'left',
+                    type: 'radio',
+                    options: ["悬浮引用视图", "关闭引用视图"],
+                    default: "悬浮引用视图",
+                },
+
+
                 refFetchingTimeout: {
                     section: "引用内容加载",
                     label: "超时时限（毫秒）",
@@ -106,6 +117,8 @@ class Configurations {
         floatingOpacity: 100, // 90,
         // 悬浮淡入的时长（暂不支持淡出）
         fadingDuration: 0, // '80ms',
+        //
+        hoverRefLinkToFloatRefView: true,
         // 如为真，在固定时点击图钉按钮会直接关闭引用内容，而非转为悬浮
         clickPinToCloseView: false,
         // 获取引用内容多少毫秒算超时
@@ -135,8 +148,13 @@ class Configurations {
             ?? this.defaults.fadingDuration;
     }
 
+    get hoverRefLinkToFloatRefView(): boolean {
+        return (this.getValue('onHoverOnRefLink') === "悬浮展现引用内容")
+            ?? this.defaults.hoverRefLinkToFloatRefView;
+    }
+
     get clickPinToCloseView(): boolean {
-        return this.getValue('clickPinToCloseView')
+        return (this.getValue('onClickPinOnOpenRefView') === "关闭引用视图")
             ?? this.defaults.clickPinToCloseView;
     }
 
