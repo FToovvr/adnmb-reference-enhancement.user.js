@@ -48,4 +48,13 @@ export class ViewHelper {
         }
     }
 
+    static addStyle(styleText: string, id) {
+        const style = document.createElement('style');
+        style.id = id;
+        style.classList.add('fto-style');
+        // TODO: fade out
+        style.append(styleText);
+        document.head.append(style);
+    }
+
 }

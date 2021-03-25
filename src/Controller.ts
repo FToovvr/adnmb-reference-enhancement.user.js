@@ -49,12 +49,7 @@ export class Controller {
             [additionalStyleText, 'fto-style-additional-fixed'],
             [this.makeAdditionalVariableStyleText(), 'fto-style-additional-variable'],
         ]) {
-            const style = document.createElement('style');
-            style.id = id;
-            style.classList.add('fto-style');
-            // TODO: fade out
-            style.append(styleText);
-            document.head.append(style);
+            ViewHelper.addStyle(styleText, id);
         }
 
         configurations.onConfigurationChange(() => {

@@ -1,5 +1,7 @@
 /// <reference path="../types/GM_config/gm_config.js" />
 
+import { ViewHelper } from './ViewHelper';
+
 import configWindowStyle from './configWindow.scss';
 
 export function canConfigurate() {
@@ -8,14 +10,20 @@ export function canConfigurate() {
 
 class Configurations {
 
+    id = 'fto-config-window-reference-enhancement';
+    styleId = 'fto-style-config-window-reference-enhancement';
+
     gmc: GM_configStruct;
 
     private onConfigurationChangeCallbacks: (() => void)[] = [];
 
     constructor() {
         if (!canConfigurate()) { return; }
+
+        ViewHelper.addStyle(configWindowStyle, this.styleId);
+
         this.gmc = new GM_configStruct({
-            id: "adnmb-reference-enhancement",
+            id: this.id,
             title: "「A岛引用查看增强」 用户脚本 设置",
             fields: {
                 collapsedHeight: {
@@ -44,14 +52,14 @@ class Configurations {
 
                 onHoverOnRefLink: {
                     section: [null, "行为"],
-                    label: "当鼠标位于引用链接上时",
+                    label: "当鼠标位于引用链接上时…",
                     labelPos: 'left',
                     type: 'radio',
                     options: ["无行为", "悬浮展现引用内容"],
                     default: "悬浮展现引用内容",
                 },
                 onClickPinOnOpenRefView: {
-                    label: "在引用视图固定时点击「📌」",
+                    label: "在引用视图固定时点击「📌」…",
                     labelPos: 'left',
                     type: 'radio',
                     options: ["悬浮引用视图", "关闭引用视图"],
@@ -60,15 +68,15 @@ class Configurations {
 
                 autoOpenTarget: {
                     section: [null, "自动打开"],
-                    label: "自动打开的对象",
+                    label: "自动打开…",
                     labelPos: 'left',
                     type: 'radio',
                     title: "",
-                    options: ["无", "内容已缓存的引用视图"],
+                    options: ["无", "内容已有缓存的引用视图"],
                     default: "无",
                 },
                 autoOpenStatus: {
-                    label: "自动打开后引用视图的状态",
+                    label: "自动打开后引用视图…",
                     labelPos: 'left',
                     type: 'radio',
                     title: "",
@@ -83,12 +91,11 @@ class Configurations {
                     default: 1,
                 },
                 autoOpenScope: {
-                    label: "自动打开的作用范围",
+                    label: "获取到新的引用内容后，自动打开所有包含该内容的引用视图",
                     labelPos: 'left',
-                    type: 'radio',
+                    type: 'checkbox',
                     title: "",
-                    options: ["只在初次加载页面和引用视图时尝试自动打开", "在缓存了新的引用内容后自动打开其他相同内容的引用视图"],
-                    default: "只在初次加载页面和引用视图时尝试自动打开",
+                    default: false,
                 },
 
 
@@ -109,23 +116,29 @@ class Configurations {
                     default: false,
                 }
             },
+            frame: (() => {
+                const frame = document.createElement('div');
+                frame.style.display = 'none';
+                document.body.append(frame);
+                return frame;
+            })(),
             events: {
-                open: () => {
-                    const frame = (this.gmc as any).frame as HTMLIFrameElement;
-                    frame.setAttribute('style', `
-                        position: fixed; z-index: 9999;
-                        left: 50%; top: 50%; transform: translate(-50%, -50%);
-                        width: fit-content; height: 500px; max-height: 80%;
-                        border: 1px solid black;
-                    `);
-                },
                 save: () => {
                     for (const fn of this.onConfigurationChangeCallbacks) {
                         fn();
                     }
                 },
+                open: () => {
+                    const frame = (this.gmc as any).frame as HTMLDivElement;
+                    frame.setAttribute('style', '');
+                    const header = frame.querySelector('.config_header') as HTMLElement;
+                    header.style.padding = '6px 0';
+                    frame.prepend(header);
+                    frame.querySelector('#fto-config-window-reference-enhancement_saveBtn').textContent = "保存";
+                    frame.querySelector('#fto-config-window-reference-enhancement_closeBtn').textContent = "关闭";
+                    frame.querySelector('#fto-config-window-reference-enhancement_resetLink').textContent = "将所有设置重置为默认状态";
+                },
             },
-            css: configWindowStyle,
         });
 
     }

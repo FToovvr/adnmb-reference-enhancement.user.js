@@ -23,6 +23,7 @@
   * TODO: 让页面中原本的回应（根回应）也可以折叠？
     * TODO: 根回应折叠时的 emoji？
   * TODO: 是不是把 `state` 改成 `refViewStatus`/`refLinkStatus` 比较好？
+  * TODO: BEM？
 
 * TODO ??:
   * TODO?: 优化引用内容的空白？

@@ -1,36 +1,60 @@
-body {
+#fto-config-window-reference-enhancement {
+    position: fixed;
+    z-index: 9999;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     width: fit-content;
-}
+    height: fit-content;
+    max-height: 80%;
+    border: 1px solid black;
+    overflow: scroll;
+    padding: 12px;
 
-.config_header {
-    &::after {
-        content: "\A（本页面可滚动）";
-        white-space: pre;
-        font-size: small;
+    // .config_header {
+    //     &::after {
+    //         content: "\A（本页面可滚动）";
+    //         white-space: pre;
+    //         font-size: small;
+    //     }
+    // }
+
+    #fto-config-window-reference-enhancement_wrapper {
+        display: flex;
+        width: 800px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        flex-direction: column;
+        align-items: center;
+        height: 450px;
+
+        > * {
+            width: 45%;
+        }
     }
-}
 
-.config_var {
-    display: flex;
-    justify-content: space-between;
+    .config_var {
+        display: flex;
+        justify-content: space-between;
 
-    > label {
-        min-width: fit-content;
-    }
-    > input[type="text"] {
-        flex-grow: 1;
-        text-align: right;
-        max-width: 60px;
-    }
+        > label {
+            min-width: fit-content;
+        }
+        > input[type="text"] {
+            flex-grow: 1;
+            text-align: right;
+            max-width: 60px;
+        }
 
-    :nth-child(2) {
-        text-align: right;
+        :nth-child(2) {
+            text-align: right;
 
-        input[type="radio"],
-        input[type="checkbox"] {
-            ~ ::before {
-                content: "\A";
-                white-space: pre;
+            input[type="radio"],
+            input[type="checkbox"] {
+                ~ ::before {
+                    content: "\A";
+                    white-space: pre;
+                }
             }
         }
     }
