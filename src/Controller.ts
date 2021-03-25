@@ -249,17 +249,15 @@ export class Controller {
         if (configurations.autoOpenRefViewIfRefContentAlreadyCached
             && !this.isInsideReference(viewDiv, refId)) {
             (async () => {
-                await new Promise<void>(async (resolve) => {
-                    const refCache = await this.model.getRefCache(refId);
-                    if (refCache) {
+                const refCache = await this.model.getRefCache(refId);
+                if (refCache) {
+                    await new Promise<void>(async (resolve) => {
                         this.changeViewStatus(viewDiv, 'open');
                         viewDiv.append(refCache);
                         this.setupContent(refCache, resolve);
-                    } else {
-                        resolve();
-                    }
-                });
-                this.changeViewStatus(viewDiv, 'collapsed');
+                    });
+                    this.changeViewStatus(viewDiv, 'collapsed');
+                }
                 parentAutoOpenPromiseResolve?.();
             })();
         } else {
