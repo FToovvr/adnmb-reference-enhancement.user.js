@@ -21,7 +21,7 @@ class Configurations {
                 collapsedHeight: {
                     section: ["引用视图", "外观表现"],
                     label: "折叠高度（px）",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'float',
                     title: "引用视图被折叠后保持的高度。"
                         + "低于此高度的引用内容不可折叠。",
@@ -29,21 +29,21 @@ class Configurations {
                 },
                 floatingOpacity: {
                     label: "悬浮不透明度（%）",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'float',
                     title: "悬浮时引用视图的不透明度。",
                     default: 100,
                 },
                 fadingDuration: {
                     label: "悬浮淡入时长（毫秒）",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'float',
                     title: "为什么只有淡入？因为淡出的代码不能一步到位，摸了 (ゝ∀･)",
                     default: 0,
                 },
                 clickPinToCloseView: {
                     label: "固定状态下点击「📌」直接关闭引用视图",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'checkbox',
                     title: "如不选定，固定状态下点击「📌」会使引用视图变为悬浮状态。",
                     default: false,
@@ -51,7 +51,7 @@ class Configurations {
                 autoOpenRefViewIfRefContentAlreadyCached: {
                     section: [null, "自动固定"],
                     label: "自动固定已有缓存的引用视图",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'checkbox',
                     title: "如选定且引用视图对应的内容存在缓存，会自动以折叠状态固定。"
                         + "（页面已存在的内容与获取过一次的引用内容都会被缓存）",
@@ -65,7 +65,7 @@ class Configurations {
                 refFetchingTimeout: {
                     section: "引用内容加载",
                     label: "超时时限（毫秒）",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'float',
                     title: "获取引用内容多久算超时。"
                         + "如为「0」则代表无超时时限。",
@@ -73,7 +73,7 @@ class Configurations {
                 },
                 showRefreshButtonEvenIfRefContentLoaded: {
                     label: "总是显示刷新按钮",
-                    labelPos: "left",
+                    labelPos: 'left',
                     type: 'checkbox',
                     title: "即使引用内容成功加载，也显示刷新按钮。"
                         + "无论选定与否，目前都不会在加载途中显示刷新按钮。",
