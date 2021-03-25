@@ -1,13 +1,6 @@
-'use strict';
-
 import { Model } from './Model';
 import { Controller } from './Controller';
-
-declare global {
-    interface Window {
-        disableAdnmbReferenceViewerEnhancementUserScript: boolean | undefined;
-    }
-}
+import configurations, { canConfigurate } from './configurations';
 
 function entry() {
 
@@ -20,6 +13,10 @@ function entry() {
     if (!model.isSupported) {
         console.log("浏览器功能不支持「A岛引用查看增强」用户脚本，将终止。");
         return;
+    }
+
+    if (canConfigurate() && typeof GM_registerMenuCommand !== 'undefined') {
+        GM_registerMenuCommand("打开配置窗口", () => { configurations.openConfigurationWindow(); }, 'c');
     }
 
     // 销掉原先的预览方法

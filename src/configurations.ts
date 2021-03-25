@@ -2,24 +2,24 @@
 
 import configWindowStyle from './configWindow.scss';
 
+export function canConfigurate() {
+    return typeof GM_configStruct !== 'undefined';
+}
+
 class Configurations {
 
     gmc: GM_configStruct;
 
     private onConfigurationChangeCallbacks: (() => void)[] = [];
 
-    static get canConfigurate() {
-        return typeof GM_configStruct !== 'undefined';
-    }
-
     constructor() {
-        if (!Configurations.canConfigurate) { return; }
+        if (!canConfigurate()) { return; }
         this.gmc = new GM_configStruct({
             id: "adnmb-reference-enhancement",
             title: "「A岛引用查看增强」 用户脚本 设置",
             fields: {
                 collapsedHeight: {
-                    section: "引用视图",
+                    section: ["引用视图", "外观表现"],
                     label: "折叠高度（px）",
                     labelPos: "left",
                     type: 'float',
@@ -63,7 +63,7 @@ class Configurations {
                 //     title: "获取到引用内容后，自动固定其他对应了相同内容的引用视图。请配合上一个选项使用。",
                 // },
                 refFetchingTimeout: {
-                    section: "加载引用",
+                    section: "引用内容加载",
                     label: "超时时限（毫秒）",
                     labelPos: "left",
                     type: 'float',
@@ -99,7 +99,6 @@ class Configurations {
             css: configWindowStyle,
         });
 
-        window.debugOpenConfigurationWindow = () => this.openConfigurationWindow();
     }
 
     openConfigurationWindow() {
@@ -111,7 +110,7 @@ class Configurations {
     }
 
     getValue(name: string): any {
-        return Configurations.canConfigurate ? this.gmc.get(name) : null;
+        return canConfigurate() ? this.gmc.get(name) : null;
     }
 
     defaults = {
