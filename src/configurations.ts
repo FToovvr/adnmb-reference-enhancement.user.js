@@ -48,20 +48,6 @@ class Configurations {
                     title: "如不选定，固定状态下点击「📌」会使引用视图变为悬浮状态。",
                     default: false,
                 },
-                autoOpenRefViewIfRefContentAlreadyCached: {
-                    section: [null, "自动固定"],
-                    label: "自动固定已有缓存的引用视图",
-                    labelPos: 'left',
-                    type: 'checkbox',
-                    title: "如选定且引用视图对应的内容存在缓存，会自动以折叠状态固定。"
-                        + "（页面已存在的内容与获取过一次的引用内容都会被缓存）",
-                    default: false,
-                },
-                // autoOpenOtherRefViewsWithSameRefIdAfterOpenOne: {
-                //     label: "一同固定其他相同内容的引用视图",
-                //     type: 'checkbox',
-                //     title: "获取到引用内容后，自动固定其他对应了相同内容的引用视图。请配合上一个选项使用。",
-                // },
                 refFetchingTimeout: {
                     section: "引用内容加载",
                     label: "超时时限（毫秒）",
@@ -136,41 +122,37 @@ class Configurations {
 
     get collapsedHeight(): number {
         return this.getValue('collapsedHeight')
-            || this.defaults.collapsedHeight;
+            ?? this.defaults.collapsedHeight;
     }
 
     get floatingOpacity(): number {
         return this.getValue('floatingOpacity')
-            || this.defaults.floatingOpacity;
+            ?? this.defaults.floatingOpacity;
     }
 
     get fadingDuration(): number {
         return this.getValue('fadingDuration')
-            || this.defaults.fadingDuration;
+            ?? this.defaults.fadingDuration;
     }
 
     get clickPinToCloseView(): boolean {
         return this.getValue('clickPinToCloseView')
-            || this.defaults.clickPinToCloseView;
+            ?? this.defaults.clickPinToCloseView;
     }
 
     get refFetchingTimeout(): number {
         return this.getValue('refFetchingTimeout')
-            || this.defaults.refFetchingTimeout;
+            ?? this.defaults.refFetchingTimeout;
     }
 
     get autoOpenRefViewIfRefContentAlreadyCached(): boolean {
-        return this.getValue('autoOpenRefViewIfRefContentAlreadyCached')
+        return false // this.getValue('autoOpenRefViewIfRefContentAlreadyCached')
             || this.defaults.autoOpenRefViewIfRefContentAlreadyCached;
     }
 
-    // get autoOpenOtherRefViewsWithSameRefIdAfterOpenOne(): boolean {
-    //     return this.getValue('autoOpenOtherRefViewsWithSameRefIdAfterOpenOne') || this.defaults.autoOpenOtherRefViewsWithSameRefIdAfterOpenOne;
-    // }
-
     get showRefreshButtonEvenIfRefContentLoaded(): boolean {
         return this.getValue('showRefreshButtonEvenIfRefContentLoaded')
-            || this.defaults.showRefreshButtonEvenIfRefContentLoaded;
+            ?? this.defaults.showRefreshButtonEvenIfRefContentLoaded;
     }
 
 }
