@@ -5,7 +5,7 @@
             "dom"
         ],
         "target": "es6",
-        "outFile": "dist/out.js",
+        "outFile": null, //"dist/out.js",
         "alwaysStrict": true
     },
     "include": [
