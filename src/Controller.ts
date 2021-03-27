@@ -241,7 +241,7 @@ export class Controller {
 
         Utils.insertAfter(linkElem, viewDiv);
 
-        if (configurations.autoOpenRefViewIfRefContentAlreadyCached
+        if (configurations.autoOpenRConfig.target === 'ViewsWhoseContentHasBeenCached'
             && !this.isInsideReference(viewDiv, refId)) {
             (async () => {
                 const refCache = await this.model.getRefCache(refId);

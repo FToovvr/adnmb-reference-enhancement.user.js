@@ -3,6 +3,7 @@
 import { ViewHelper } from './ViewHelper';
 
 import configWindowStyle from './configWindow.scss';
+import { AutoOpenConfig } from './AutoOpenConfig';
 
 export function canConfigurate() {
     return typeof GM_configStruct !== 'undefined';
@@ -90,8 +91,8 @@ class Configurations {
                     title: "",
                     default: 1,
                 },
-                autoOpenScope: {
-                    label: "获取到新的引用内容后，自动打开所有包含该内容的引用视图",
+                autoOpenOtherRefViewsAfterOpenedOneWithSameRef: {
+                    label: "打开一个引用视图后，自动打开其他相同引用的引用视图",
                     labelPos: 'left',
                     type: 'checkbox',
                     title: "",
@@ -162,18 +163,20 @@ class Configurations {
         floatingOpacity: 100, // 90,
         // 悬浮淡入的时长（暂不支持淡出）
         fadingDuration: 0, // '80ms',
+
         //
-        hoverRefLinkToFloatRefView: true,
+        onHoverOnRefLink: "悬浮展现引用内容",
         // 如为真，在固定时点击图钉按钮会直接关闭引用内容，而非转为悬浮
-        clickPinToCloseView: false,
+        onClickPinOnOpenRefView: "悬浮引用视图",
+
+        autoOpenTarget: "无",
+        autoOpenStatus: "折叠",
+        autoOpenDepthLimit: 1,
+        autoOpenOtherRefViewsAfterOpenedOneWithSameRef: false,
+
+
         // 获取引用内容多少毫秒算超时
         refFetchingTimeout: 10000, // : 10 秒
-        // 如为真，存在缓存的引用内容会自动以折叠的形式固定
-        autoOpenRefViewIfRefContentAlreadyCached: false,
-        // // 如为真，展开一处引用将展开当前已知所有其他处指向相同内容的引用
-        // // TODO: 考虑也自动展开之后才遇到的指向相同内容的引用？
-        // // 尚未实现
-        // autoOpenOtherRefViewsWithSameRefIdAfterOpenOne: false,
         // 在内容成功加载后是否还显示刷新按钮
         showRefreshButtonEvenIfRefContentLoaded: false,
     };
@@ -194,13 +197,13 @@ class Configurations {
     }
 
     get hoverRefLinkToFloatRefView(): boolean {
-        return (this.getValue('onHoverOnRefLink') === "悬浮展现引用内容")
-            ?? this.defaults.hoverRefLinkToFloatRefView;
+        return (this.getValue('onHoverOnRefLink') ?? this.defaults.onHoverOnRefLink)
+            === "悬浮展现引用内容";
     }
 
     get clickPinToCloseView(): boolean {
-        return (this.getValue('onClickPinOnOpenRefView') === "关闭引用视图")
-            ?? this.defaults.clickPinToCloseView;
+        return (this.getValue('onClickPinOnOpenRefView') ?? this.defaults.onClickPinOnOpenRefView)
+            === "关闭引用视图";
     }
 
     get refFetchingTimeout(): number {
@@ -208,9 +211,16 @@ class Configurations {
             ?? this.defaults.refFetchingTimeout;
     }
 
-    get autoOpenRefViewIfRefContentAlreadyCached(): boolean {
-        return false // this.getValue('autoOpenRefViewIfRefContentAlreadyCached')
-            || this.defaults.autoOpenRefViewIfRefContentAlreadyCached;
+    get autoOpenRConfig(): AutoOpenConfig {
+        return new AutoOpenConfig(
+            ((this.getValue('autoOpenTarget') ?? this.defaults.autoOpenTarget) === '内容已有缓存的引用视图')
+                ? 'ViewsWhoseContentHasBeenCached' : null,
+            ((this.getValue('autoOpenStatus') ?? this.defaults.autoOpenStatus) === '完整展开')
+                ? 'open' : 'collapsed',
+            this.getValue('autoOpenDepthLimit') ?? this.defaults.autoOpenDepthLimit,
+            this.getValue('autoOpenOtherRefViewsAfterOpenedOneWithSameRef')
+            ?? this.defaults.autoOpenOtherRefViewsAfterOpenedOneWithSameRef,
+        );
     }
 
     get showRefreshButtonEvenIfRefContentLoaded(): boolean {
