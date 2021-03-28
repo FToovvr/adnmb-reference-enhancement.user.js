@@ -1,5 +1,5 @@
-import { Controller } from "./Controller";
-import { Model } from "./Model";
+import { Controller } from "../Controller";
+import { Model } from "../Model";
 
 export { };
 

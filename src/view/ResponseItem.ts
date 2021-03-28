@@ -1,4 +1,3 @@
-import { RecordRefCallback } from "../Model";
 import { BaseRawItem } from "./BaseRawItem";
 import { ThreadItem } from './ThreadItem';
 

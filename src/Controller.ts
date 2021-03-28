@@ -2,11 +2,10 @@ import { Model } from './Model';
 import { ViewHelper } from './ViewHelper';
 import { ThreadItem } from './view/ThreadItem';
 import { RefItem } from './view/RefItem';
-import { Utils } from './Utils';
 
 import configurations from './configurations';
 
-import additionalStyleText from './style.scss';
+import additionalStyleText from './style/style.scss';
 
 export class Controller {
 

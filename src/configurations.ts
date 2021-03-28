@@ -2,7 +2,7 @@
 
 import { ViewHelper } from './ViewHelper';
 
-import configWindowStyle from './configWindow.scss';
+import configWindowStyle from './style/configWindow.scss';
 import { AutoOpenConfig } from './AutoOpenConfig';
 
 export function canConfigurate() {
