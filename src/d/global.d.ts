@@ -6,6 +6,6 @@ export { };
 declare global {
     interface Window {
         disableAdnmbReferenceViewerEnhancementUserScript: boolean | undefined;
-        ftoDeubg: { model: Model, controller: Controller };
+        ftoDebug: { model: Model, controller: Controller };
     }
 }

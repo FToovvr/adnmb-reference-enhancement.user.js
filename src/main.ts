@@ -30,7 +30,7 @@ function entry() {
     Controller.setupStyle();
 
     const controller = new Controller(model);
-    window.ftoDeubg = { model, controller };
+    window.ftoDebug = { model, controller };
     controller.setupRoot();
 }
 
