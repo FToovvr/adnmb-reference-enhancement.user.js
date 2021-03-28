@@ -128,7 +128,7 @@ export class Controller {
                         refView.displayStatus = 'open';
                         this.setupContent(refView, refCache, error, resolve);
                     });
-                    refView.displayStatus = 'collapsed';
+                    refView.displayStatus = configurations.autoOpenRConfig.viewStatusAfterOpened;
                 }
                 parentAutoOpenPromiseResolve?.();
             })();
