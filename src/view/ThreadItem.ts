@@ -4,7 +4,7 @@ import { ResponseItem } from "./ResponseItem";
 export class ThreadItem extends BaseRawItem {
 
     constructor({ elem }: { elem: HTMLDivElement }) {
-        console.assert(elem.classList.contains('h-threads-item'));
+        console.assert(!!elem.querySelector(':scope > .h-threads-item-main'));
         super({ elem });
     }
 

@@ -61,7 +61,7 @@ export class Controller {
     }
 
     setupRoot() {
-        document.body.querySelectorAll('.h-threads-item').forEach((threadItemElem) => {
+        document.body.querySelectorAll('.h-threads-item[h-threads-id]').forEach((threadItemElem) => {
             const threadItem = new ThreadItem({ elem: threadItemElem as HTMLDivElement });
             // 将串首加入缓存
             this.model.recordRef(threadItem.postId, threadItem.createPseudoRefContentClone(), null, 'global');

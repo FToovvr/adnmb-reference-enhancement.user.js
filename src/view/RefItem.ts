@@ -151,7 +151,7 @@ export class RefItem extends BaseItem {
         }
 
         // 标「外串」
-        if (this.placedInThread!.postId !== this.postId) {
+        if (this.placedInThread!.postId !== this.belongsToThreadId) {
             const outerThreadLabel = document.createElement('span');
             outerThreadLabel.textContent = "(外串)";
             outerThreadLabel.classList.add('uk-text-secondary', 'uk-text-small', 'fto-outer-thread-label');
@@ -339,7 +339,8 @@ export class RefItem extends BaseItem {
 
     get placedInThread() {
         const parent = this.elem.parentElement!;
-        const threadElem = parent.closest('.h-threads-item');
+
+        const threadElem = ViewHelper.getClosestThreadElement(parent);
         if (threadElem) {
             return new ThreadItem({ elem: threadElem as HTMLDivElement });
         }

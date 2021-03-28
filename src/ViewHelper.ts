@@ -4,6 +4,10 @@ export class ViewHelper {
         return document.querySelector(`.fto-ref-link[data-view-id="${viewId}"]`) as HTMLElement;
     }
 
+    static getClosestThreadElement(currentElement: HTMLElement) {
+        return currentElement.closest('.h-threads-item[data-threads-id]');
+    }
+
     static addStyle(styleText: string, id) {
         const style = document.createElement('style');
         style.id = id;

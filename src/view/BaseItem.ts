@@ -9,7 +9,6 @@ export abstract class BaseItem {
     get countOfAncestorsWithSameContent() {
         let n = 0;
         for (let item = this.parentItem; item; item = item.parentItem) {
-            console.log(item);
             if (item.postId === this.postId) {
                 n++;
             }

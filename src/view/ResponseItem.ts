@@ -1,3 +1,4 @@
+import { ViewHelper } from "../ViewHelper";
 import { BaseRawItem } from "./BaseRawItem";
 import { ThreadItem } from './ThreadItem';
 
@@ -11,7 +12,7 @@ export class ResponseItem extends BaseRawItem {
     get parentItem() {
         const parent = this.elem.parentElement!;
 
-        const threadElem = parent.closest('.h-threads-item');
+        const threadElem = ViewHelper.getClosestThreadElement(parent);
         if (threadElem) {
             return new ThreadItem({ elem: threadElem as HTMLDivElement });
         }
