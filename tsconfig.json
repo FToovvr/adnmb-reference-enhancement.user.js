@@ -6,7 +6,8 @@
         ],
         "target": "es6",
         "outFile": null, //"dist/out.js",
-        "alwaysStrict": true
+        "alwaysStrict": true,
+        "strictNullChecks": true,
     },
     "include": [
         "src/**/*"

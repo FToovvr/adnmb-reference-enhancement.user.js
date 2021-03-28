@@ -21,6 +21,10 @@
     }
 }
 
+$z-index-collapsing-mask: 99;
+$z-index-floating-view: 999;
+$z-index-pin-mask: 999;
+
 .fto-ref-view {
     // 照搬自 h.desktop.css '#h-ref-view .h-threads-item-ref'
     background: #f0e0d6;
@@ -33,7 +37,7 @@
     margin-left: -5px;
     margin-right: -40px;
 
-    &[data-status="closed"] {
+    &[data-display-status="closed"] {
         //display: none;
         opacity: 0;
         display: inline-block;
@@ -45,16 +49,16 @@
         margin: 0;
     }
 
-    &[data-status="floating"] {
+    &[data-display-status="floating"] {
         position: absolute;
-        z-index: 999;
+        z-index: $z-index-floating-view;
     }
 
-    &[data-status="open"] {
+    &[data-display-status="open"] {
         @extend %fto-ref-view-fixed;
     }
 
-    &[data-status="collapsed"] {
+    &[data-display-status="collapsed"] {
         @extend %fto-ref-view-fixed;
 
         overflow: hidden;
@@ -68,7 +72,7 @@
             height: 20px;
             width: 100%;
             background: linear-gradient(#f0e0d600, #ffeeddcc);
-            z-index: 999;
+            z-index: $z-index-collapsing-mask;
         }
     }
 
@@ -91,12 +95,12 @@
         transform: rotate(-45deg);
     }
 
-    &[data-is-loading] .fto-ref-view-refresh {
+    &[data-loading-status="loading"] .fto-ref-view-refresh {
         display: none;
     }
 
     @each $status in "floating", "collapsed" {
-        &[data-status="#{$status}"] > {
+        &[data-display-status="#{$status}"] > {
             .h-threads-item > .h-threads-item-ref > .h-threads-item-reply-main > .h-threads-info,
             .fto-ref-view-error,
             .fto-ref-view-loading {
@@ -112,7 +116,7 @@
                             height: 110%;
                             width: 100%;
                             background: linear-gradient(#f0e0d600, #f0e0d6ff);
-                            z-index: 999;
+                            z-index: $z-index-pin-mask;
                             transform: rotate(45deg);
                         }
                     }

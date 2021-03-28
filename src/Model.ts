@@ -1,11 +1,12 @@
-import { Controller } from './Controller';
-import { ViewHelper } from './ViewHelper';
+import { RefItem } from './view/RefItem';
 
 import configurations from './configurations';
 
+export type RecordRefCallback = (refId: number, rawItem: HTMLElement, error: Error | null, scope: 'page' | 'global') => void;
+
 export class Model {
 
-    refCache: { [refId: number]: HTMLElement } = {};
+    refCache: { [refId: number]: [HTMLElement, Error | null] } = {};
     refsInFetching = new Set<number>();
     refSubscriptions = new Map<number, Set<string>>();
 
@@ -16,40 +17,41 @@ export class Model {
         return true;
     }
 
-    async getRefCache(refId: number): Promise<HTMLElement> | null {
-        const elem = this.refCache[refId];
+    async getRefCache(refId: number): Promise<[HTMLElement, Error | null] | null> {
+        const [elem, error] = this.refCache[refId] ?? [null, null];
         if (!elem) { return null; }
-        return elem.cloneNode(true) as HTMLElement;
+        return [elem.cloneNode(true) as HTMLElement, error];
     }
 
 
-    async recordRef(refId: number, rawItem: HTMLElement, scope: 'page' | 'global' = 'page') {
-        this.refCache[refId] = rawItem.cloneNode(true) as HTMLElement;
+    async recordRef(refId: number, rawItem: HTMLElement, error: Error | null, scope: 'page' | 'global' = 'page') {
+        this.refCache[refId] = [rawItem.cloneNode(true) as HTMLElement, error];
     }
 
-    async subscribeForLoadingItemElement(controller: Controller, refId: number, viewId: string, ignoresCache: boolean = false) {
+    async subscribeForLoadingItemElement(refId: number, viewId: string, ignoresCache: boolean = false,
+        doneCallbace: (viewIds: Set<string>, content: HTMLElement | null, error: Error | null) => void,
+        reportSpentTimeCallback: (masterViewId: string, viewIds: Set<string>, spentMs: number) => boolean) {
         if (!this.refSubscriptions.has(refId)) {
             this.refSubscriptions.set(refId, new Set());
         }
-        this.refSubscriptions.get(refId).add(viewId);
+        this.refSubscriptions.get(refId)!.add(viewId);
 
-        const itemCache = ignoresCache ? null : await this.getRefCache(refId);
-        if (itemCache) {
-            const item = this.processItemElement(itemCache, refId);
-            controller.updateViewContent(viewId, item);
+        const cache = ignoresCache ? null : await this.getRefCache(refId);
+        if (cache) {
+            const [itemCache, error] = cache;
+            doneCallbace(new Set([viewId]), itemCache, error);
         } else if (!this.refsInFetching.has(refId)) {
             this.refsInFetching.add(refId);
 
-            let item = await this.fetchItemElement(controller, refId, viewId);
-            item = this.processItemElement(item, refId);
-            this.refSubscriptions.get(refId).forEach((subscriptedViewId) => {
-                controller.updateViewContent(subscriptedViewId, item.cloneNode(true) as HTMLElement);
-            });
+            const [item, error2] = await this.fetchItemElement(refId, viewId, reportSpentTimeCallback);
+            doneCallbace(this.refSubscriptions.get(refId)!, item, error2);
             this.refsInFetching.delete(refId);
         }
     }
 
-    async fetchItemElement(controller: Controller, refId: number, viewId: string) {
+    async fetchItemElement(refId: number, viewId: string,
+        reportSpentTimeCallback: (masterViewId: string, viewIds: Set<string>, spentMs: number) => boolean
+    ): Promise<[HTMLElement | null, Error | null]> {
         const itemContainer = document.createElement('div');
         const abortController = new AbortController();
         try {
@@ -59,16 +61,17 @@ export class Model {
                     let spentMs = 0;
                     const intervalId = setInterval(() => {
                         spentMs += 20;
-                        if (!controller.isLoading(viewId)) {
-                            clearInterval(intervalId);
-                        } else if (configurations.refFetchingTimeout && spentMs >= configurations.refFetchingTimeout) {
+                        if (configurations.refFetchingTimeout
+                            && spentMs >= configurations.refFetchingTimeout) {
                             reject(new Error('Timeout'));
                             abortController.abort();
                             clearInterval(intervalId);
-                        } else {
-                            this.refSubscriptions.get(refId).forEach((viewIdToReport) => {
-                                controller.reportSpentTime(viewIdToReport, spentMs);
-                            });
+                            return;
+                        }
+                        const shouldContinue = reportSpentTimeCallback(viewId,
+                            this.refSubscriptions.get(refId)!, spentMs);
+                        if (!shouldContinue) {
+                            clearInterval(intervalId);
                         }
                     }, 20);
                 }),
@@ -85,29 +88,13 @@ export class Model {
             } else {
                 message = `获取引用内容失败：${String(e)}`;
             }
-            const errorSpan = document.createElement('span');
-            errorSpan.classList.add('fto-ref-view-error');
-            errorSpan.textContent = message;
-            return errorSpan;
+            return [null, new Error(message)];
         }
 
         const item = itemContainer.firstElementChild as HTMLElement;
-        this.recordRef(refId, item, 'global');
-        return item;
-    }
-
-    processItemElement(item: HTMLElement, refId: number) {
-        if (item.querySelector('.fto-ref-view-error')) {
-            return item;
-        }
-        if (!ViewHelper.getThreadID(item)) {
-            const errorSpan = document.createElement('span');
-            errorSpan.classList.add('fto-ref-view-error');
-            errorSpan.textContent = `引用内容不存在！`;
-            this.recordRef(refId, item, 'page');
-            return errorSpan;
-        }
-        return item;
+        const error = RefItem.contentExists(item) ? null : new Error("引用内容不存在！");
+        this.recordRef(refId, item, error, error ? 'page' : 'global');
+        return [item, error];
     }
 
 }

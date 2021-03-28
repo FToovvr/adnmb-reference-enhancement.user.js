@@ -21,16 +21,17 @@ function entry() {
 
     // 销掉原先的预览方法
     document.querySelectorAll('font[color="#789922"]').forEach((elem) => {
-        if (elem.textContent.startsWith('>>')) {
+        if (elem.textContent!.startsWith('>>')) {
             const newElem = elem.cloneNode(true);
-            elem.parentElement.replaceChild(newElem, elem);
+            elem.parentElement!.replaceChild(newElem, elem);
         }
     });
 
     Controller.setupStyle();
 
     const controller = new Controller(model);
-    controller.setupContent(document.body);
+    window.ftoDeubg = { model, controller };
+    controller.setupRoot();
 }
 
 entry();

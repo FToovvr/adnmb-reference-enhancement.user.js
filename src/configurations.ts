@@ -135,9 +135,9 @@ class Configurations {
                     const header = frame.querySelector('.config_header') as HTMLElement;
                     header.style.padding = '6px 0';
                     frame.prepend(header);
-                    frame.querySelector('#fto-config-window-reference-enhancement_saveBtn').textContent = "保存";
-                    frame.querySelector('#fto-config-window-reference-enhancement_closeBtn').textContent = "关闭";
-                    frame.querySelector('#fto-config-window-reference-enhancement_resetLink').textContent = "将所有设置重置为默认状态";
+                    frame.querySelector('#fto-config-window-reference-enhancement_saveBtn')!.textContent = "保存";
+                    frame.querySelector('#fto-config-window-reference-enhancement_closeBtn')!.textContent = "关闭";
+                    frame.querySelector('#fto-config-window-reference-enhancement_resetLink')!.textContent = "将所有设置重置为默认状态";
                 },
             },
         });

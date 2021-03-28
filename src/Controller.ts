@@ -1,5 +1,7 @@
 import { Model } from './Model';
 import { ViewHelper } from './ViewHelper';
+import { ThreadItem } from './view/ThreadItem';
+import { RefItem } from './view/RefItem';
 import { Utils } from './Utils';
 
 import configurations from './configurations';
@@ -16,16 +18,16 @@ export class Controller {
 
     static makeAdditionalVariableStyleText() {
         let styleText = `
-        .fto-ref-view[data-status="floating"] {
+        .fto-ref-view[data-display-status="floating"] {
             opacity: ${configurations.floatingOpacity}%;
             transition: opacity ${configurations.fadingDuration}ms ease-in;
         }
 
-        .fto-ref-view[data-status="collapsed"] {
+        .fto-ref-view[data-display-status="collapsed"] {
             max-height: ${configurations.collapsedHeight}px;
         }
 
-        .fto-ref-view[data-status="closed"] {
+        .fto-ref-view[data-display-status="closed"] {
             /* transition: opacity ${configurations.fadingDuration}ms ease-out; */
         }
         `;
@@ -53,42 +55,44 @@ export class Controller {
         }
 
         configurations.onConfigurationChange(() => {
-            const style = document.querySelector('#fto-style-additional-variable');
+            const style = document.querySelector('#fto-style-additional-variable')!;
             style.innerHTML = '';
             style.append(this.makeAdditionalVariableStyleText());
         });
     }
 
-    setupContent(root: HTMLElement, parentAutoOpenPromiseResolve: (() => void) | null = null) {
-
-        if (root === document.body) {
-            root.querySelectorAll('.h-threads-item').forEach((threadItemElem) => {
-                this.setupThreadContent(threadItemElem as HTMLElement);
-            });
-        } else if (ViewHelper.hasFetchingRefSucceeded(root)) {
-            const repliesElem = root.closest('.h-threads-item-replys');
-            let threadElem;
-            if (repliesElem) { // 在串的回应中
-                threadElem = repliesElem.closest('.h-threads-item');
-            } else { // 在串首中
-                threadElem = root.closest('.h-threads-item-main');
+    setupRoot() {
+        document.body.querySelectorAll('.h-threads-item').forEach((threadItemElem) => {
+            const threadItem = new ThreadItem({ elem: threadItemElem as HTMLDivElement });
+            // 将串首加入缓存
+            this.model.recordRef(threadItem.postId, threadItem.createPseudoRefContentClone(), null, 'global');
+            // 将各回应加入缓存
+            for (const response of threadItem.responses) {
+                this.model.recordRef(response.postId, response.createPseudoRefContentClone(), null, 'global');
             }
-            const threadID = ViewHelper.getThreadID(threadElem);
-            const po = ViewHelper.getPosterID(threadElem);
-            this.setupRefContent(root, threadID, po);
-        } else {
-            this.setupErrorRefContent(root);
-            return;
+        });
+
+        this.setupRefLinks(ViewHelper.getRefLinks(document.body));
+    }
+
+    setupContent(item: RefItem, content: HTMLElement | null, error: Error | null,
+        parentAutoOpenPromiseResolve?: (() => void)) {
+
+        item.setupContent(content, error, this.startLoadingViewContent.bind(this));
+        if (item.loadingStatus === 'succeed') {
+            this.setupRefLinks(item.refLinks, parentAutoOpenPromiseResolve);
         }
 
-        const linkElems = root.querySelectorAll('font[color="#789922"]');
+    }
+
+    setupRefLinks(linkElems: NodeListOf<Element>,
+        parentAutoOpenPromiseResolve: (() => void) | null = null) {
         if (linkElems.length === 0) {
             parentAutoOpenPromiseResolve?.();
             return;
         }
         let unfinished = linkElems.length;
         linkElems.forEach(linkElem => {
-            if (!linkElem.textContent.startsWith('>>')) { return; }
             (async () => { // 此时不 async 更待何时 (ゝ∀･)？
                 this.setupRefLink(linkElem as HTMLElement, () => {
                     unfinished--;
@@ -98,291 +102,67 @@ export class Controller {
                 });
             })();
         });
-
     }
 
-    setupThreadContent(threadItemElem: HTMLElement) {
-        const threadID = ViewHelper.getThreadID(threadItemElem);
-
-        { // 将串首加入缓存
-            const originalItemMainElem = threadItemElem.querySelector('.h-threads-item-main');
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('h-threads-item');
-            const itemRefDiv = document.createElement('div');
-            itemRefDiv.classList.add('h-threads-item-reply', 'h-threads-item-ref');
-            itemDiv.append(itemRefDiv);
-            const itemMainDiv = originalItemMainElem.cloneNode(true) as HTMLElement;
-            itemMainDiv.className = '';
-            itemMainDiv.classList.add('h-threads-item-reply-main');
-            itemRefDiv.append(itemMainDiv);
-            const infoDiv = itemMainDiv.querySelector('.h-threads-info');
-            try { // 尝试修正几个按钮的位置。以后如果A岛自己修正了这里就会抛异常
-                const messedUpDiv = infoDiv.querySelector('.h-admin-tool').closest('.h-threads-info-report-btn');
-                if (!messedUpDiv) { // 版块页面里的各个按钮没搞砸
-                    infoDiv.querySelectorAll('.h-threads-info-report-btn a').forEach((aElem) => {
-                        if (aElem.textContent !== "举报") {
-                            aElem.closest('.h-threads-info-report-btn').remove();
-                        }
-                    });
-                    infoDiv.querySelector('.h-threads-info-reply-btn').remove();
-                } else { // 串内容页面的各个按钮搞砸了
-                    infoDiv.append(
-                        '', messedUpDiv.querySelector('.h-threads-info-id'),
-                        '', messedUpDiv.querySelector('.h-admin-tool'),
-                    );
-                    messedUpDiv.remove();
-                }
-            } catch (e) {
-                console.log(e);
-            }
-            this.model.recordRef(threadID, itemDiv, 'global');
-        }
-
-        // 将各回应加入缓存
-        threadItemElem.querySelectorAll('.h-threads-item-replys .h-threads-item-reply').forEach((originalItemElem) => {
-            const div = document.createElement('div');
-            div.classList.add('h-threads-item');
-            const itemElem = originalItemElem.cloneNode(true) as HTMLElement;
-            itemElem.classList.add('h-threads-item-ref');
-            itemElem.querySelector('.h-threads-item-reply-icon').remove();
-            itemElem.querySelectorAll('.uk-text-primary').forEach((labelElem) => {
-                if (labelElem.textContent === "(PO主)") {
-                    labelElem.remove();
-                }
-            });
-            div.append(itemElem);
-            this.model.recordRef(ViewHelper.getPostID(itemElem), div, 'global');
-        });
-    }
-
-    setupRefContent(elem: HTMLElement, threadID: number, po: string) {
-        const infoElem = elem.querySelector('.h-threads-info') as HTMLElement;
-
-        // 补标 PO
-        if (ViewHelper.getPosterID(infoElem) === po) {
-            const poLabel = document.createElement('span');
-            poLabel.textContent = "(PO主)";
-            poLabel.classList.add('uk-text-primary', 'uk-text-small', 'fto-po-label');
-            const uidElem = infoElem.querySelector('.h-threads-info-uid');
-            Utils.insertAfter(uidElem, poLabel);
-            Utils.insertAfter(uidElem, document.createTextNode(' '));
-        }
-
-        // 标「外串」
-        if (ViewHelper.getThreadID(infoElem) !== threadID) {
-            const outerThreadLabel = document.createElement('span');
-            outerThreadLabel.textContent = "(外串)";
-            outerThreadLabel.classList.add('uk-text-secondary', 'uk-text-small', 'fto-outer-thread-label');
-            const idElem = infoElem.querySelector('.h-threads-info-id');
-            idElem.append(' ', outerThreadLabel);
-        }
-
-        this.setupButtons(infoElem);
-    }
-
-    setupErrorRefContent(elem: HTMLElement) {
-        this.setupButtons(elem);
-    }
-
-    setupButtons(elem: HTMLElement) {
-        const viewDiv = elem.closest('.fto-ref-view') as HTMLElement;
-        const linkElem = ViewHelper.getRefLinkByViewId(viewDiv.dataset.viewId);
-
-        const buttonListSpan = document.createElement('span');
-        buttonListSpan.classList.add('fto-ref-view-button-list');
-
-        // 图钉📌按钮
-        const pinSpan = document.createElement('span');
-        pinSpan.classList.add('fto-ref-view-pin', 'fto-ref-view-button');
-        pinSpan.textContent = "📌";
-        pinSpan.addEventListener('click', () => {
-            if (viewDiv.dataset.status === 'floating') {
-                this.changeViewStatus(viewDiv, 'open');
-            } else {
-                this.changeViewStatus(viewDiv, configurations.clickPinToCloseView ? 'closed' : 'floating');
-            }
-        });
-        buttonListSpan.append(pinSpan);
-
-        // 刷新🔄按钮
-        const refreshSpan = document.createElement('span');
-        refreshSpan.classList.add('fto-ref-view-refresh', 'fto-ref-view-button');
-        refreshSpan.textContent = "🔄";
-        refreshSpan.addEventListener('click', () => {
-            this.startLoadingViewContent(viewDiv, Number(linkElem.dataset.refId), true);
-        });
-        Utils.insertAfter(pinSpan, refreshSpan);
-        buttonListSpan.append(refreshSpan);
-
-        elem.prepend(buttonListSpan);
-    }
-
-    setupRefLink(linkElem: HTMLElement, parentAutoOpenPromiseResolve: (() => void) | null) {
+    setupRefLink(linkElem: HTMLElement, parentAutoOpenPromiseResolve?: (() => void)) {
         linkElem.classList.add('fto-ref-link');
         // closed: 无固定显示 view; open: 有固定显示 view
-        linkElem.dataset.status = 'closed';
+        linkElem.dataset.displayStatus = 'closed';
 
-        const r = /^>>No.(\d+)$/.exec(linkElem.textContent);
-        if (!r) { return; }
+        const r = /^>>No.(\d+)$/.exec(linkElem.textContent!);
+        if (!r) {
+            parentAutoOpenPromiseResolve?.();
+            return;
+        }
         const refId = Number(r[1]);
         linkElem.dataset.refId = String(refId);
 
-        const viewId = Utils.generateViewID();
-        linkElem.dataset.viewId = viewId;
-
-        const viewDiv = document.createElement('div');
-        viewDiv.classList.add('fto-ref-view');
-        viewDiv.dataset.refId = String(refId);
-        viewDiv.dataset.viewId = viewId;
-        // closed: 不显示; floating: 悬浮显示; open: 完整固定显示; collapsed: 折叠固定显示
-        this.changeViewStatus(viewDiv, 'closed');
-
-        viewDiv.style.setProperty('--offset-left', `${Utils.getCoords(linkElem).left}px`);
-
-        Utils.insertAfter(linkElem, viewDiv);
+        const refView = new RefItem({ refId });
+        refView.mount(linkElem, this.startLoadingViewContent.bind(this));
 
         if (configurations.autoOpenRConfig.target === 'ViewsWhoseContentHasBeenCached'
-            && !this.isInsideReference(viewDiv, refId)) {
+            && refView.countOfAncestorsWithSameContent <= 1) {
             (async () => {
-                const refCache = await this.model.getRefCache(refId);
+                const [refCache, error] = await this.model.getRefCache(refId) ?? [null, null];
                 if (refCache) {
                     await new Promise<void>(async (resolve) => {
-                        this.changeViewStatus(viewDiv, 'open');
-                        viewDiv.append(refCache);
-                        this.setupContent(refCache, resolve);
+                        refView.displayStatus = 'open';
+                        this.setupContent(refView, refCache, error, resolve);
                     });
-                    this.changeViewStatus(viewDiv, 'collapsed');
+                    refView.displayStatus = 'collapsed';
                 }
                 parentAutoOpenPromiseResolve?.();
             })();
         } else {
             parentAutoOpenPromiseResolve?.();
         }
+    }
 
-        // 处理悬浮
-        linkElem.addEventListener('mouseenter', () => {
-            if (viewDiv.dataset.status !== 'closed') {
-                viewDiv.dataset.isHovering = '1';
-                return;
-            } else if (configurations.hoverRefLinkToFloatRefView) {
-                this.changeViewStatus(viewDiv, 'floating');
-                viewDiv.dataset.isHovering = '1';
-                this.startLoadingViewContent(viewDiv, refId);
-            }
-        });
-        viewDiv.addEventListener('mouseenter', () => {
-            viewDiv.dataset.isHovering = '1';
-        });
-        for (const elem of [linkElem, viewDiv]) {
-            elem.addEventListener('mouseleave', () => {
-                if (viewDiv.dataset.status !== 'floating') {
-                    return;
+    startLoadingViewContent(refItem: RefItem, refId: number, forced: boolean = false) {
+        if (!forced && refItem.loadingStatus === 'succeed') {
+            return;
+        } else if (refItem.loadingStatus === 'loading') { // TODO: 也可以强制从头重新加载？
+            return;
+        }
+        refItem.loadingStatus = 'loading';
+
+        this.model.subscribeForLoadingItemElement(refId, refItem.viewId, forced,
+            (viewIds, content, error) => {
+                for (const viewId of viewIds) {
+                    const item = RefItem.findItemByViewId(viewId)!;
+                    this.setupContent(item, content ? content.cloneNode(true) as HTMLElement : null, error);
                 }
-                delete viewDiv.dataset.isHovering;
-                (async () => {
-                    setTimeout(() => {
-                        if (!viewDiv.dataset.isHovering) {
-                            this.changeViewStatus(viewDiv, 'closed');
-                        }
-                    }, 200);
-                })();
+            }, (masterViewId, viewIds, spentMs) => {
+                const masterItem = RefItem.findItemByViewId(masterViewId)!;
+                if (masterItem.loadingStatus !== 'loading') {
+                    return false;
+                }
+                for (const viewId of viewIds) {
+                    const item = RefItem.findItemByViewId(viewId)!;
+                    item.loadingSpentTime = spentMs;
+                }
+                return true;
             });
-        }
-
-        // 处理折叠
-        linkElem.addEventListener('click', () => {
-            if (viewDiv.dataset.status === 'open') {
-                this.changeViewStatus(viewDiv, 'collapsed');
-            } else {
-                this.changeViewStatus(viewDiv, 'open');
-                this.startLoadingViewContent(viewDiv, refId);
-            }
-        });
-        viewDiv.addEventListener('click', () => {
-            if (viewDiv.dataset.status === 'collapsed') {
-                this.changeViewStatus(viewDiv, 'open');
-            }
-        });
-    }
-
-    startLoadingViewContent(viewDiv: HTMLElement, refId: number, forced: boolean = false) {
-        if (!forced && viewDiv.hasChildNodes()) {
-            return;
-        } else if (viewDiv.dataset.isLoading) { // TODO: 也可以强制从头重新加载？
-            return;
-        }
-        this.setupLoading(viewDiv);
-
-        this.model.subscribeForLoadingItemElement(this, refId, viewDiv.dataset.viewId, forced);
-    }
-
-    setupLoading(viewDiv: HTMLElement) {
-        viewDiv.dataset.isLoading = '1';
-
-        const loadingSpan = document.createElement('span');
-        loadingSpan.classList.add('fto-ref-view-loading');
-        const loadingTextSpan = document.createElement('span');
-        loadingTextSpan.classList.add('fto-ref-view-loading-text');
-        loadingTextSpan.dataset.waitedMilliseconds = '0';
-        loadingTextSpan.textContent = "加载中…";
-        loadingSpan.append(loadingTextSpan);
-        viewDiv.innerHTML = '';
-        viewDiv.append(loadingSpan);
-        this.setupButtons(loadingSpan);
-    }
-
-    isLoading(viewId: string) {
-        return !!ViewHelper.getRefViewByViewId(viewId).dataset.isLoading;
-    }
-
-    reportSpentTime(viewId: string, spentMs: number) {
-        const viewDiv = ViewHelper.getRefViewByViewId(viewId);
-        if (!this.isLoading(viewId)) {
-            this.setupLoading(viewDiv);
-        }
-        viewDiv.querySelector('.fto-ref-view-loading-text')
-            .textContent = `加载中… ${(spentMs / 1000.0).toFixed(2)}s`;
-    }
-
-    updateViewContent(viewId: string, itemElement: HTMLElement) {
-        const viewDiv = ViewHelper.getRefViewByViewId(viewId);
-        delete viewDiv.dataset.isLoading;
-        viewDiv.innerHTML = '';
-        viewDiv.append(itemElement);
-        this.setupContent(itemElement);
-    }
-
-    changeViewStatus(viewDiv: HTMLElement, status: 'closed' | 'floating' | 'open' | 'collapsed') {
-
-        switch (status) {
-            case 'closed': case 'floating': case 'open':
-                viewDiv.dataset.status = status;
-                break;
-            case 'collapsed':
-                if (viewDiv.clientHeight > configurations.collapsedHeight) {
-                    viewDiv.dataset.status = 'collapsed';
-                } else {
-                    viewDiv.dataset.status = 'open';
-                }
-                break;
-        }
-
-        const linkElem = ViewHelper.getRefLinkByViewId(viewDiv.dataset.viewId);
-        switch (viewDiv.dataset.status) {
-            case 'closed': case 'floating':
-                linkElem.dataset.status = 'closed';
-                break;
-            case 'open': case 'collapsed':
-                linkElem.dataset.status = 'open';
-        }
-
-    }
-
-    isInsideReference(viewDiv: HTMLElement, refId: number) {
-        for (const _ of ViewHelper.getAncestorRefViews(viewDiv, refId)) {
-            return true;
-        }
-        return false;
     }
 
 }

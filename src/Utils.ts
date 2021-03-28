@@ -9,7 +9,7 @@ export class Utils {
     }
 
     static insertAfter(node: Node, newNode: Node) {
-        node.parentNode.insertBefore(newNode, node.nextSibling);
+        node.parentNode!.insertBefore(newNode, node.nextSibling);
     }
 
     // https://stackoverflow.com/a/26230989
