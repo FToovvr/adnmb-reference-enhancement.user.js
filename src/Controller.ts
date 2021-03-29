@@ -119,7 +119,7 @@ export class Controller {
         const refView = new RefItem({ refId });
         refView.mount(linkElem, this.startLoadingViewContent.bind(this));
 
-        if (configurations.autoOpenRConfig.target === 'ViewsWhoseContentHasBeenCached'
+        if (configurations.autoOpenConfig.target === 'ViewsWhoseContentHasBeenCached'
             && refView.countOfAncestorsWithSameContent <= 1) {
             (async () => {
                 const [refCache, error] = await this.model.getRefCache(refId) ?? [null, null];
@@ -128,7 +128,7 @@ export class Controller {
                         refView.displayStatus = 'open';
                         this.setupContent(refView, refCache, error, resolve);
                     });
-                    refView.displayStatus = configurations.autoOpenRConfig.viewStatusAfterOpened;
+                    refView.displayStatus = configurations.autoOpenConfig.viewStatusAfterOpened;
                 }
                 parentAutoOpenPromiseResolve?.();
             })();

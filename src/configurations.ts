@@ -211,7 +211,7 @@ class Configurations {
             ?? this.defaults.refFetchingTimeout;
     }
 
-    get autoOpenRConfig(): AutoOpenConfig {
+    get autoOpenConfig(): AutoOpenConfig {
         return new AutoOpenConfig(
             ((this.getValue('autoOpenTarget') ?? this.defaults.autoOpenTarget) === '内容已有缓存的引用视图')
                 ? 'ViewsWhoseContentHasBeenCached' : null,
