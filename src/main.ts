@@ -15,6 +15,11 @@ function entry() {
         return;
     }
 
+    if (/^\/m(obile)?(\/|$)/i.test(window.location.pathname)) {
+        console.log("「A岛引用查看增强」用户脚本暂不支持网页「手机版」，将终止。");
+        return;
+    }
+
     if (canConfigurate() && typeof GM_registerMenuCommand !== 'undefined') {
         GM_registerMenuCommand("打开配置窗口", () => { configurations.openConfigurationWindow(); }, 'c');
     }
