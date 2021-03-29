@@ -9,7 +9,7 @@
 
 ## 示例
 
-![](https://user-images.githubusercontent.com/69508340/112814917-59cb3480-90b2-11eb-90cd-e8c285ccb9c3.mov)
+![](https://user-images.githubusercontent.com/69508340/112822020-fa712280-90b9-11eb-95a6-7b862faad0e5.mp4)
 
 ## 使用前请注意
 
