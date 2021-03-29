@@ -9,7 +9,7 @@
 
 ## 示例
 
-![](https://user-images.githubusercontent.com/69508340/112822020-fa712280-90b9-11eb-95a6-7b862faad0e5.mp4)
+![Screen Recording 2021-03-23 at 2 27 07 AM 2 2021-03-29 18_42_05](https://user-images.githubusercontent.com/69508340/112825838-d237f280-90be-11eb-9096-6e62f66f82f4.gif)
 
 ## 使用前请注意
 
@@ -27,7 +27,7 @@
 
 详见 [TODO.md](TODO.md)。
 
-逐渐咕咕咕化 ( ´_っ`)
+逐渐咕咕咕化 ( ´_っ\`)
 
 * 0.4 完整实现自动打开引用功能（默认关闭）
 * 0.5 实现持久化缓存
