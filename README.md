@@ -7,11 +7,9 @@
 [![Greasy Fork 页面](https://img.shields.io/badge/Greasy%20Fork-页面-orange)](https://greasyfork.org/en/scripts/423659)
 [![Userscript 安装](https://img.shields.io/badge/Userscript-安装-red)](https://greasyfork.org/scripts/423659-a岛引用查看增强/code/A岛引用查看增强.user.js)
 
-## Build
+## 示例
 
-> `npm run build`
-
-输出的文件为 `/dist/out.user.js`。
+![](https://user-images.githubusercontent.com/69508340/112814917-59cb3480-90b2-11eb-90cd-e8c285ccb9c3.mov)
 
 ## 使用前请注意
 
@@ -50,3 +48,9 @@
   * [x] 为引用内容加载设置了超时时限
   * [x] 如果引用内容消失，会指明
   * [x] 加载失败（如超时、引用内容消失）时，可以通过点击「🔄」按钮重试
+
+## Build
+
+> `npm run build`
+
+输出的文件为 `/dist/out.user.js`。
