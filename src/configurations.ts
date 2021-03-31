@@ -67,32 +67,24 @@ class Configurations {
                     default: "悬浮引用视图",
                 },
 
-                autoOpenTarget: {
-                    section: [null, "自动打开"],
-                    label: "自动打开…",
+                autoOpenOperation: {
+                    section: [null, "自动固定"],
+                    label: "对于内容已有缓存的引用视图…",
                     labelPos: 'left',
                     type: 'radio',
                     title: "",
-                    options: ["无", "内容已有缓存的引用视图"],
-                    default: "无",
-                },
-                autoOpenStatus: {
-                    label: "自动打开后引用视图…",
-                    labelPos: 'left',
-                    type: 'radio',
-                    title: "",
-                    options: ["完整展开", "折叠"],
-                    default: "折叠",
+                    options: ["无行为", "自动固定并折叠", "自动固定并展开"],
+                    default: "无行为",
                 },
                 autoOpenDepthLimit: {
-                    label: "自动打开层数限制（「0」为不限）",
+                    label: "自动固定的最大深入层数（「0」为不限）",
                     labelPos: 'left',
                     type: 'int',
                     title: "",
                     default: 1,
                 },
                 autoOpenOtherRefViewsAfterOpenedOneWithSameRef: {
-                    label: "打开一个引用视图后，自动打开其他相同引用的引用视图",
+                    label: "固定一个引用视图后，将其他相同引用的引用视图也固定",
                     labelPos: 'left',
                     type: 'checkbox',
                     title: "",
@@ -169,8 +161,7 @@ class Configurations {
         // 如为真，在固定时点击图钉按钮会直接关闭引用内容，而非转为悬浮
         onClickPinOnOpenRefView: "悬浮引用视图",
 
-        autoOpenTarget: "无",
-        autoOpenStatus: "折叠",
+        autoOpenOperation: "无行为",
         autoOpenDepthLimit: 1,
         autoOpenOtherRefViewsAfterOpenedOneWithSameRef: false,
 
@@ -213,9 +204,9 @@ class Configurations {
 
     get autoOpenConfig(): AutoOpenConfig {
         return new AutoOpenConfig(
-            ((this.getValue('autoOpenTarget') ?? this.defaults.autoOpenTarget) === '内容已有缓存的引用视图')
+            ((this.getValue('autoOpenOperation') ?? this.defaults.autoOpenOperation) !== '无行为')
                 ? 'ViewsWhoseContentHasBeenCached' : null,
-            ((this.getValue('autoOpenStatus') ?? this.defaults.autoOpenStatus) === '完整展开')
+            ((this.getValue('autoOpenOperation') ?? this.defaults.autoOpenOperation) === '自动固定并展开')
                 ? 'open' : 'collapsed',
             this.getValue('autoOpenDepthLimit') ?? this.defaults.autoOpenDepthLimit,
             this.getValue('autoOpenOtherRefViewsAfterOpenedOneWithSameRef')
