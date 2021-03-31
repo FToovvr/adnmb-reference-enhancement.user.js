@@ -122,6 +122,8 @@ export class RefItem extends BaseItem {
             // 会导致展开的内容：正文文本/空白、头部空白、点击后会展开的引用链接、点击后会固定的图钉按钮
             e.stopPropagation();
             const targetElem = e.target as HTMLElement;
+            let shouldOpen: boolean; // 有可能导致高度改变的操作需要设这个值而非直接返回
+            let itemToRefresh: BaseItem | null = this;
             if (targetElem.classList.contains('fto-ref-link')) {
                 // 如果点的是引用链接，要先处理该链接对应的引用视图。
                 // 需要展开其父视图的情况：点击链接后会固定引用视图
@@ -131,29 +133,35 @@ export class RefItem extends BaseItem {
                 }
                 if (targetItem.displayStatus === 'open') {
                     targetItem.displayStatus = 'collapsed';
-                    return;
+                    shouldOpen = false;
+                } else {
+                    targetItem.displayStatus = 'open';
+                    shouldOpen = true;
                 }
-                targetItem.displayStatus = 'open';
-            } else if (this.displayStatus !== 'collapsed') {
-                // 本来就没有被折叠，不用展开
+            } else if (targetElem.classList.contains('fto-ref-view-pin')) {
+                // 如果是为了关闭视图而点击图钉，不会展开
+                shouldOpen = !this.isPinned; // shouldOpen a.k.a. shouldPin
+                this.displayStatus = shouldOpen ? 'open' : 'floating';
+                itemToRefresh = this.parentItem;
+            } else if (!this.isPinned) {
                 return;
             } else if (
                 // 除了引用链接需要展开对应视图外，点击正文文本/空白、头部空白需要展开，
                 // 点击图钉按钮需要另行考虑，而除此之外不会展开
-                !['h-threads-content', 'h-threads-info', 'fto-ref-view-pin']
+                !['h-threads-content', 'h-threads-info']
                     .map((c) => targetElem.classList.contains(c))
                     .reduce((l, r) => l || r)
             ) {
                 return;
-            } else if (targetElem.classList.contains('fto-ref-view-pin') && this.isPinned) {
-                // 如果是为了折叠而点击图钉，不会展开
-                return;
+            } else {
+                shouldOpen = true;
             }
-
-            for (let item: BaseItem | null = this;
-                item instanceof RefItem && item.displayStatus === 'collapsed';
-                item = item.parentItem) {
-                item.displayStatus = 'open';
+            for (;
+                itemToRefresh instanceof RefItem && itemToRefresh.isPinned;
+                itemToRefresh = itemToRefresh.parentItem) {
+                if (itemToRefresh.displayStatus === 'collapsed') {
+                    itemToRefresh.displayStatus = shouldOpen ? 'open' : 'collapsed';
+                }
             }
 
         });
@@ -230,13 +238,6 @@ export class RefItem extends BaseItem {
         const pinSpan = document.createElement('span');
         pinSpan.classList.add('fto-ref-view-pin', 'fto-ref-view-button');
         pinSpan.textContent = "📌";
-        pinSpan.addEventListener('click', () => {
-            if (this.displayStatus === 'floating') {
-                this.displayStatus = 'open';
-            } else {
-                this.displayStatus = configurations.clickPinToCloseView ? 'closed' : 'floating';
-            }
-        });
         buttonListSpan.append(pinSpan);
 
         // 刷新🔄按钮
