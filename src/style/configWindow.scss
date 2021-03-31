@@ -1,3 +1,18 @@
+// 临时
+* {
+    #fto-config-window-reference-enhancement_autoOpenDepthLimit_var,
+    #fto-config-window-reference-enhancement_autoOpenOtherRefViewsAfterOpenedOneWithSameRef_var {
+        label,
+        input {
+            text-decoration: line-through;
+        }
+        &::before {
+            content: "(未实现)";
+            font-size: xx-small;
+        }
+    }
+}
+
 #fto-config-window-reference-enhancement {
     position: fixed;
     z-index: 9999;
