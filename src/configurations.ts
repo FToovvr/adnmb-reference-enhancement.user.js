@@ -50,6 +50,12 @@ class Configurations {
                     title: "为什么只有淡入？因为淡出的代码不能一步到位，摸了 (ゝ∀･)",
                     default: 0,
                 },
+                displayOpenedRefLinkInItalics: {
+                    label: "以斜体显示视图固定的引用链接",
+                    labelPos: 'left',
+                    type: 'checkbox',
+                    default: false,
+                },
 
                 onHoverOnRefLink: {
                     section: [null, "行为"],
@@ -155,6 +161,8 @@ class Configurations {
         floatingOpacity: 100, // 90,
         // 悬浮淡入的时长（暂不支持淡出）
         fadingDuration: 0, // '80ms',
+        //
+        displayOpenedRefLinkInItalics: true,
 
         //
         onHoverOnRefLink: "悬浮展现引用内容",
@@ -185,6 +193,11 @@ class Configurations {
     get fadingDuration(): number {
         return this.getValue('fadingDuration')
             ?? this.defaults.fadingDuration;
+    }
+
+    get displayOpenedRefLinkInItalics(): boolean {
+        return this.getValue('displayOpenedRefLinkInItalics')
+            ?? this.defaults.displayOpenedRefLinkInItalics;
     }
 
     get hoverRefLinkToFloatRefView(): boolean {

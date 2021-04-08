@@ -42,6 +42,14 @@ export class Controller {
             `;
         }
 
+        if (configurations.displayOpenedRefLinkInItalics) {
+            styleText += `
+            .fto-ref-link[data-display-status="open"] {
+                font-style: italic;
+            }
+            `;
+        }
+
         return styleText;
     }
 
