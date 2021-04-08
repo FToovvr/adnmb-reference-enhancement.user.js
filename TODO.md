@@ -20,14 +20,10 @@
     * TODO: 甚至错打成全角符号的串号？
 
 * TODO ?:
-  * TODO: 随时有图钉按钮解除固定？
+  * TODO: 长引用内容随时有图钉按钮解除固定？
   * TODO: 要不要考虑尝试在重新加载后还原先前展开/折叠的状态？
   * TODO: 悬浮淡出
   * TODO: 折叠时点击 mask，preventDefault？
   * TODO: 让页面中原本的回应（根回应）也可以折叠？
     * TODO: 根回应折叠时的 emoji？
-  * TODO: 是不是把 `state` 改成 `refViewStatus`/`refLinkStatus` 比较好？
   * TODO: BEM？
-
-* TODO ??:
-  * TODO?: 优化引用内容的空白？
