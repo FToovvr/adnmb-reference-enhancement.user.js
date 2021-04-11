@@ -58,7 +58,6 @@ export function init(enabled: () => boolean, setupRoot: (root: HTMLElement | HTM
             const template = domParser.parseFromString(await resp.text(), 'text/html');
             const loadedContent = (() => {
                 const ukContainer = template.querySelector('#h-content > .uk-container');
-                console.log(template, ukContainer);
                 if (!ukContainer) { return null; }
                 const threadList = ukContainer.querySelector(':scope > .h-threads-list');
                 if (!threadList) { return null; }
