@@ -55,14 +55,14 @@ export class Controller {
 
     static setupStyle() {
         for (const [styleText, id] of [
-            [additionalStyleText, 'fto-style-additional-fixed'],
-            [this.makeAdditionalVariableStyleText(), 'fto-style-additional-variable'],
+            [additionalStyleText, 'fto-style-adnmb-reference-enhancement-fixed'],
+            [this.makeAdditionalVariableStyleText(), 'fto-style-adnmb-reference-enhancement-variable'],
         ]) {
             ViewHelper.addStyle(styleText, id);
         }
 
         configurations.onConfigurationChange(() => {
-            const style = document.querySelector('#fto-style-additional-variable')!;
+            const style = document.querySelector('#fto-style-adnmb-reference-enhancement-variable')!;
             style.innerHTML = '';
             style.append(this.makeAdditionalVariableStyleText());
         });

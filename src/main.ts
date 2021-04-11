@@ -3,6 +3,7 @@ import { Controller } from './Controller';
 import configurations, { canConfigurate } from './configurations';
 
 import { init as autoLoadNextPageInit } from './otherScripts/autoLoadNextPage';
+import { HideSageContent } from './otherScripts/hideSageContent'
 
 function entry() {
 
@@ -47,12 +48,17 @@ function entry() {
     Controller.setupStyle();
 
     const controller = new Controller(model);
+    const hideSageContent = new HideSageContent(configurations.hideSageContent);
+    configurations.onConfigurationChange(() => {
+        hideSageContent.enabled = configurations.hideSageContent;
+    })
 
     window.fto = {
         AdnmbReferenceViewerEnhancement: {
             debug: { model, controller },
-            setup: (document: HTMLDocument) => {
+            setup: (document: HTMLElement | HTMLDocument) => {
                 controller.setupRoot(document);
+                hideSageContent.setup(document, configurations.openAdminSageContent);
             },
         },
     };

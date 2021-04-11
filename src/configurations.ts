@@ -115,12 +115,27 @@ class Configurations {
                     default: false,
                 },
 
+
                 autoLoadNextPage: {
                     section: ["兼并不兼容脚本功能", "页面自动拼接"],
                     label: "自动拼接下一页的内容",
                     labelPos: 'left',
                     type: 'checkbox',
                     default: false,
+                },
+
+                hideSageContent: {
+                    section: [null, 'SAGE 内容隐藏'],
+                    label: "隐藏标为 SAGE 的内容",
+                    labelPos: 'left',
+                    type: 'checkbox',
+                    default: false,
+                },
+                openAdminSageContent: {
+                    label: "默认展开红名所发的标为 SAGE 的内容",
+                    labelPos: 'left',
+                    type: 'checkbox',
+                    default: true,
                 }
             },
             frame: (() => {
@@ -188,6 +203,8 @@ class Configurations {
         showRefreshButtonEvenIfRefContentLoaded: false,
 
         autoLoadNextPage: false,
+        hideSageContent: false,
+        openAdminSageContent: true,
     };
 
     get collapsedHeight(): number {
@@ -245,6 +262,16 @@ class Configurations {
     get autoLoadNextPage(): boolean {
         return this.getValue('autoLoadNextPage')
             ?? this.defaults.autoLoadNextPage;
+    }
+
+    get hideSageContent(): boolean {
+        return this.getValue('hideSageContent')
+            ?? this.defaults.hideSageContent;
+    }
+
+    get openAdminSageContent(): boolean {
+        return this.getValue('openAdminSageContent')
+            ?? this.defaults.openAdminSageContent;
     }
 
 }
