@@ -113,6 +113,14 @@ class Configurations {
                     title: "即使引用内容成功加载，也显示刷新按钮。"
                         + "无论选定与否，目前都不会在加载途中显示刷新按钮。",
                     default: false,
+                },
+
+                autoLoadNextPage: {
+                    section: ["兼并不兼容脚本功能", "页面自动拼接"],
+                    label: "自动拼接下一页的内容",
+                    labelPos: 'left',
+                    type: 'checkbox',
+                    default: false,
                 }
             },
             frame: (() => {
@@ -178,6 +186,8 @@ class Configurations {
         refFetchingTimeout: 10000, // : 10 秒
         // 在内容成功加载后是否还显示刷新按钮
         showRefreshButtonEvenIfRefContentLoaded: false,
+
+        autoLoadNextPage: false,
     };
 
     get collapsedHeight(): number {
@@ -230,6 +240,11 @@ class Configurations {
     get showRefreshButtonEvenIfRefContentLoaded(): boolean {
         return this.getValue('showRefreshButtonEvenIfRefContentLoaded')
             ?? this.defaults.showRefreshButtonEvenIfRefContentLoaded;
+    }
+
+    get autoLoadNextPage(): boolean {
+        return this.getValue('autoLoadNextPage')
+            ?? this.defaults.autoLoadNextPage;
     }
 
 }

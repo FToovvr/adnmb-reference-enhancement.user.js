@@ -5,6 +5,7 @@ export class Utils {
     // https://stackoverflow.com/a/59837035
     static generateViewID() {
         Utils.currentGeneratedViewID += 1;
+        // return String(`${Math.random().toString(36).replace('0.', '')}.${Utils.currentGeneratedViewID}.${(new Date()).getTime()}`);
         return String(Utils.currentGeneratedViewID);
     }
 

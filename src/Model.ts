@@ -53,48 +53,56 @@ export class Model {
         reportSpentTimeCallback: (masterViewId: string, viewIds: Set<string>, spentMs: number) => boolean
     ): Promise<[HTMLElement | null, Error | null]> {
         const itemContainer = document.createElement('div');
-        const abortController = new AbortController();
         try {
-            const resp = await Promise.race([
-                fetch(`/Home/Forum/ref?id=${refId}`, { signal: abortController.signal }),
-                new Promise((_, reject) => {
-                    let spentMs = 0;
-                    const intervalId = setInterval(() => {
-                        spentMs += 20;
-                        if (configurations.refFetchingTimeout
-                            && spentMs >= configurations.refFetchingTimeout) {
-                            reject(new Error('Timeout'));
-                            abortController.abort();
-                            clearInterval(intervalId);
-                            return;
-                        }
-                        const shouldContinue = reportSpentTimeCallback(viewId,
-                            this.refSubscriptions.get(refId)!, spentMs);
-                        if (!shouldContinue) {
-                            clearInterval(intervalId);
-                        }
-                    }, 20);
-                }),
-            ]) as Response;
+            const resp = await Model.fetchWithTimeout(`/Home/Forum/ref?id=${refId}`, (spentMs) => {
+                return reportSpentTimeCallback(viewId, this.refSubscriptions.get(refId)!, spentMs);
+            });
             itemContainer.innerHTML = await resp.text();
         } catch (e) {
-            let message;
-            if (e instanceof Error) {
-                if (e.message === 'Timeout') {
-                    message = `获取引用内容超时！`;
-                } else {
-                    message = `获取引用内容失败：${e.toString()}`;
-                }
-            } else {
-                message = `获取引用内容失败：${String(e)}`;
-            }
-            return [null, new Error(message)];
+            return [null, new Error(Model.fetchErrorToReadableMessage(e))];
         }
 
         const item = itemContainer.firstElementChild as HTMLElement;
         const error = RefItem.contentExists(item) ? null : new Error("引用内容不存在！");
         this.recordRef(refId, item, error, error ? 'page' : 'global');
         return [item, error];
+    }
+
+    static async fetchWithTimeout(input: RequestInfo,
+        reportSpentTimeCallback?: ((spentMs: number) => boolean)
+    ) {
+        const abortController = new AbortController();
+        return Promise.race([
+            fetch(input, { signal: abortController.signal }),
+            new Promise((_, reject) => {
+                let spentMs = 0;
+                const intervalId = setInterval(() => {
+                    spentMs += 20;
+                    if (configurations.refFetchingTimeout
+                        && spentMs >= configurations.refFetchingTimeout) {
+                        reject(new Error('Timeout'));
+                        abortController.abort();
+                        clearInterval(intervalId);
+                        return;
+                    }
+                    const shouldContinue = reportSpentTimeCallback?.(spentMs);
+                    if (!shouldContinue) {
+                        clearInterval(intervalId);
+                    }
+                }, 20);
+            }),
+        ]) as Promise<Response>;
+    }
+
+    static fetchErrorToReadableMessage(e: any): string {
+        if (e instanceof Error) {
+            if (e.message === 'Timeout') {
+                return `获取引用内容超时！`;
+            } else {
+                return `获取引用内容失败：${e.toString()}`;
+            }
+        }
+        return `获取引用内容失败：${String(e)}`;
     }
 
 }

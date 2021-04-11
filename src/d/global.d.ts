@@ -5,7 +5,12 @@ export { };
 
 declare global {
     interface Window {
-        disableAdnmbReferenceViewerEnhancementUserScript: boolean | undefined;
-        ftoDebug: { model: Model, controller: Controller };
+        disableAdnmbReferenceViewerEnhancementUserScript?: boolean;
+        fto?: {
+            AdnmbReferenceViewerEnhancement?: {
+                debug?: { model: Model, controller: Controller };
+                setup?(document: HTMLDocument): void;
+            }
+        };
     }
 }

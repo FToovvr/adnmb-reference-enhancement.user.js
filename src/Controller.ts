@@ -68,8 +68,9 @@ export class Controller {
         });
     }
 
-    setupRoot() {
-        document.body.querySelectorAll('.h-threads-item[data-threads-id]').forEach((threadItemElem) => {
+    setupRoot(root: HTMLElement | HTMLDocument) {
+        root.querySelectorAll('.h-threads-item[data-threads-id]').forEach((threadItemElem) => {
+            console.log(threadItemElem);
             const threadItem = new ThreadItem({ elem: threadItemElem as HTMLDivElement });
             // 将串首加入缓存
             this.model.recordRef(threadItem.postId, threadItem.createPseudoRefContentClone(), null, 'global');
@@ -79,7 +80,7 @@ export class Controller {
             }
         });
 
-        this.setupRefLinks(ViewHelper.getRefLinks(document.body));
+        this.setupRefLinks(ViewHelper.getRefLinks(root));
     }
 
     setupContent(item: RefItem, content: HTMLElement | null, error: Error | null,

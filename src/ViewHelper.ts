@@ -17,7 +17,7 @@ export class ViewHelper {
         document.head.append(style);
     }
 
-    static getRefLinks(elem: HTMLElement) {
+    static getRefLinks(elem: HTMLElement | HTMLDocument) {
         return elem.querySelectorAll('font[color="#789922"]');
     }
 

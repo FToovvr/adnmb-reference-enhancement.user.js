@@ -1,5 +1,9 @@
 // 临时
 * {
+    #fto-config-window-reference-enhancement_autoOpenOperation_var::before {
+        content: "(暂不建议启用)";
+        font-size: xx-small;
+    }
     #fto-config-window-reference-enhancement_autoOpenDepthLimit_var,
     #fto-config-window-reference-enhancement_autoOpenOtherRefViewsAfterOpenedOneWithSameRef_var {
         label,
