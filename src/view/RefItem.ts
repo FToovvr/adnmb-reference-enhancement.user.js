@@ -174,6 +174,11 @@ export class RefItem extends BaseItem {
     setupContent(content: HTMLElement | null, error: Error | null,
         loadRefContentCallback: LoadRefContentCallback | null) {
         this.elem.innerHTML = '';
+
+        const maskWrapper = document.createElement('div');
+        maskWrapper.classList.add('fto-ref-view-mask-wrapper');
+        this.elem.append(maskWrapper);
+
         if (error) {
             this.loadingStatus = 'failed';
             const errorSpan = document.createElement('span');

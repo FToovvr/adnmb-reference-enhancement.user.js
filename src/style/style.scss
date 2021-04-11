@@ -65,17 +65,20 @@ $z-index-pin-mask: 999;
         text-overflow: ellipsis;
         position: static;
 
-        // TODO: 加个 wrapper 应该就能恢复原先的效果
-        // // https://stackoverflow.com/a/22809380
-        // &::before {
-        //     content: "";
-        //     position: absolute;
-        //     top: 60px;
-        //     height: 20px;
-        //     width: 100%;
-        //     background: linear-gradient(#f0e0d600, #ffeeddcc);
-        //     z-index: $z-index-collapsing-mask;
-        // }
+        // https://stackoverflow.com/a/22809380
+        & > .fto-ref-view-mask-wrapper {
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: 60px;
+                height: 20px;
+                width: 100%;
+                background: linear-gradient(#f0e0d600, #ffeeddcc);
+                z-index: $z-index-collapsing-mask;
+            }
+        }
     }
 
     .fto-ref-view-error {
