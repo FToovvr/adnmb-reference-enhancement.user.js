@@ -108,6 +108,11 @@ export class AutoLoadNextPage {
             div.append(loadedContent[2]);
         }
         if (loadedContent[3]) {
+            const oldFooter = this.hContent.querySelector('#h-footer');
+            if (oldFooter) {
+                oldFooter.id = '';
+                oldFooter.classList.add('fto-old-h-footer');
+            }
             this.hContent.append(loadedContent[3]);
         }
 
