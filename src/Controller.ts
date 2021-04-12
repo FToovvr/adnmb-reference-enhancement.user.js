@@ -116,7 +116,7 @@ export class Controller {
         // closed: 无固定显示 view; open: 有固定显示 view
         linkElem.dataset.displayStatus = 'closed';
 
-        const r = /^>>No.(\d+)$/.exec(linkElem.textContent!);
+        const r = /^>>(?:No\.)?(\d+)$/.exec(linkElem.textContent!);
         if (!r) {
             parentAutoOpenPromiseResolve?.();
             return;
