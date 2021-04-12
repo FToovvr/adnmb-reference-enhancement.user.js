@@ -9,13 +9,14 @@ export class HideSageContent {
         const style = document.querySelector('#fto-style-adnmb-reference-enhancement-other-hide-sage-content')!;
         if (enabled) {
             style.innerHTML = `
-                .fto-marked-sage .fto-force-display-toggle::before {
+                .fto-force-display-toggle {
                     cursor: pointer;
+                }
+                .fto-marked-sage .fto-force-display-toggle::before {
                     content: ' 隐藏 ';
                     font-size: small;
                 }
                 .fto-marked-sage:not(.fto-force-display) .fto-force-display-toggle::before {
-                    cursor: pointer;
                     content: ' 展开 ';
                     font-size: small;
                 }
@@ -30,7 +31,11 @@ export class HideSageContent {
                 }
             `;
         } else {
-            style.innerHTML = '';
+            style.innerHTML = `
+                .fto-force-display-toggle-wrapper {
+                    display: none;
+                }
+            `;
         }
     }
 
@@ -59,8 +64,11 @@ export class HideSageContent {
             toggle.addEventListener('click', (e) => {
                 postItem.classList.toggle('fto-force-display');
             });
+            const toggleWrapper = document.createElement('span');
+            toggleWrapper.classList.add('fto-force-display-toggle-wrapper');
+            toggleWrapper.append('[', toggle, ']');
             const sageTips = thumbsDown.closest('.h-threads-tips')!;
-            sageTips.append('', '[', toggle, ']');
+            sageTips.append('', toggleWrapper);
         });
     }
 

@@ -25,6 +25,16 @@ $z-index-collapsing-mask: 99;
 $z-index-floating-view: 999;
 $z-index-pin-mask: 999;
 
+.fto-button {
+    position: relative;
+    font-size: smaller;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .fto-ref-view {
     // 照搬自 h.desktop.css '#h-ref-view .h-threads-item-ref'
     background: #f0e0d6;
@@ -86,13 +96,7 @@ $z-index-pin-mask: 999;
     }
 
     .fto-ref-view-button {
-        position: relative;
-        font-size: smaller;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        @extend .fto-button;
     }
 
     .fto-ref-view-pin {

@@ -103,7 +103,7 @@ class Configurations {
                     label: "超时时限（毫秒）（「0」为不限）",
                     labelPos: 'left',
                     type: 'float',
-                    title: "获取引用内容多久算超时。",
+                    title: "获取内容多久算超时。对本脚本获取内容操作生效。",
                     default: 10000,
                 },
                 showRefreshButtonEvenIfRefContentLoaded: {

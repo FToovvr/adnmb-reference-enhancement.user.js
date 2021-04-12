@@ -2,8 +2,8 @@ import { Model } from './Model';
 import { Controller } from './Controller';
 import configurations, { canConfigurate } from './configurations';
 
-import { init as autoLoadNextPageInit } from './otherScripts/autoLoadNextPage';
-import { HideSageContent } from './otherScripts/hideSageContent'
+import { AutoLoadNextPage } from './otherScripts/autoLoadNextPage';
+import { HideSageContent } from './otherScripts/hideSageContent';
 
 function entry() {
 
@@ -51,7 +51,7 @@ function entry() {
     const hideSageContent = new HideSageContent(configurations.hideSageContent);
     configurations.onConfigurationChange(() => {
         hideSageContent.enabled = configurations.hideSageContent;
-    })
+    });
 
     window.fto = {
         AdnmbReferenceViewerEnhancement: {
@@ -65,8 +65,10 @@ function entry() {
 
     window.fto!.AdnmbReferenceViewerEnhancement!.setup!(document);
 
-    autoLoadNextPageInit(() => configurations.autoLoadNextPage,
-        window.fto!.AdnmbReferenceViewerEnhancement!.setup!);
+    const autoLoadNextPage = new AutoLoadNextPage(
+        () => configurations.autoLoadNextPage,
+        window.fto!.AdnmbReferenceViewerEnhancement!.setup!,
+    );
 
 }
 
