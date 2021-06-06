@@ -72,4 +72,22 @@ function entry() {
 
 }
 
-entry();
+switch (GM_info.scriptHandler) {
+case "Tampermonkey":
+    entry();
+    break;
+case "Violentmonkey":
+    // @ts-expect-error JQuery
+    $(document).ready(entry);
+    break;
+case "Greasemonkey":
+default:
+    const fn = () => {
+        if (unsafeWindow.hasOwnProperty('h')) {
+            entry();
+        } else {
+            setTimeout(fn, 10);
+        }
+    };
+    setTimeout(fn, 10);
+}
