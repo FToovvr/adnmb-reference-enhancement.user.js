@@ -5,7 +5,7 @@
             "dom"
         ],
         "target": "es6",
-        "outFile": null, //"dist/out.js",
+        "noEmit": true,
         "alwaysStrict": true,
         "strictNullChecks": true,
     },
