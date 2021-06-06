@@ -13,7 +13,11 @@
 
 ## 使用前请注意
 
-* 本脚本尚未完成，正在持续更新中；
+* 本脚本尚未完成，正在<ruby>持续<rp>（</rp><rt>无限期</rt><rp>）</rp></ruby><ruby>更新<rp>（</rp><rt>咕咕咕</rt><rp>）</rp></ruby>中；
+* 本脚本首要支持 Tampermoneky；
+    * 使用其他脚本管理器（如 Greasemonkey、Violentmonkey）加载本脚本可能会导致未预料到问题；
+    * 这表示在其他脚本管理器环境下出现的问题我恐怕无法第一时间发现；
+    * 仍欢迎反馈在其他脚本管理器环境下出现的问题，只是修复进程可能会比较缓慢。
 * 暂时不保证稳定性，可能会有影响使用的 bug；
     * 如果功能出现问题，欢迎到 [Greasy Fork 上本脚本的页面](https://greasyfork.org/en/scripts/423659/feedback)或者[岛上的此串](https://adnmb3.com/t/36028029)来反馈；
 * 请确保使用最新版本的浏览器；
@@ -41,7 +45,7 @@
 
 ## 路线图
 
-详见 [TODO.md](TODO.md)。
+详见 [TODO.md](https://github.com/FToovvr/adnmb-reference-enhancement.user.js/blob/master/TODO.md)。
 
 逐渐咕咕咕化 ( ´_っ\`)
 
