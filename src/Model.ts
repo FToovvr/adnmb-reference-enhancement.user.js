@@ -68,9 +68,10 @@ export class Model {
         return [item, error];
     }
 
-    static async fetchWithTimeout(input: RequestInfo,
+    static async fetchWithTimeout(input: string,
         reportSpentTimeCallback?: ((spentMs: number) => boolean)
     ) {
+        input = (new URL(input, window.location.href)).href;
         const abortController = new AbortController();
         return Promise.race([
             fetch(input, { signal: abortController.signal }),
